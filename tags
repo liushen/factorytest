@@ -1,0 +1,186 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.7	//
+EVENTS_MAX	gui/ft_event.h	7;"	d
+FBContext	gui/ft_framebuffer.c	/^struct FBContext$/;"	s	file:
+FBHandler	gui/ft_button.h	/^typedef void (*FBHandler)(FTButton *button, FTEvent *event);$/;"	t
+FBSurface	gui/ft_framebuffer.h	/^typedef struct _FBSurface FBSurface;$/;"	t	typeref:struct:_FBSurface
+FEContext	gui/ft_event.c	/^typedef struct _FEContext FEContext;$/;"	t	typeref:struct:_FEContext	file:
+FEKeyHandler	gui/ft_event.h	/^typedef void (*FEKeyHandler)(FTKeyEvent *event, void *data);$/;"	t
+FE_BUTTON_CLICKED	gui/ft_event.h	/^    FE_BUTTON_CLICKED,$/;"	e	enum:__anon3
+FE_BUTTON_FOCUSED	gui/ft_event.h	/^    FE_BUTTON_FOCUSED,$/;"	e	enum:__anon3
+FE_FOCUS_CHANGED	gui/ft_event.h	/^    FE_FOCUS_CHANGED,$/;"	e	enum:__anon3
+FE_KEY_EVENT	gui/ft_event.h	/^    FE_KEY_EVENT = 0,$/;"	e	enum:__anon3
+FE_KEY_PRESS	gui/ft_event.h	/^    FE_KEY_PRESS,$/;"	e	enum:__anon3
+FE_KEY_RELEASE	gui/ft_event.h	/^    FE_KEY_RELEASE,$/;"	e	enum:__anon3
+FE_MOUSE_EVENT	gui/ft_event.h	/^    FE_MOUSE_EVENT,$/;"	e	enum:__anon3
+FONT_SIZE_8x16	gui/libfbx-font-8x16.h	35;"	d
+FRAMEBUFFER_DEV_NAME	gui/ft_framebuffer.c	9;"	d	file:
+FTButton	gui/ft_button.h	/^typedef struct _FTButton FTButton;$/;"	t	typeref:struct:_FTButton
+FTColor	gui/ft_draw.h	/^typedef struct _FTColor     FTColor;$/;"	t	typeref:struct:_FTColor
+FTDrawGC	gui/ft_draw.h	/^typedef struct _FTDrawGC    FTDrawGC;$/;"	t	typeref:struct:_FTDrawGC
+FTEvent	gui/ft_event.h	/^typedef struct _FTEvent     FTEvent;$/;"	t	typeref:struct:_FTEvent
+FTEventId	gui/ft_event.h	/^typedef int    FTEventId; $/;"	t
+FTEventKey	gui/ft_event.h	/^typedef int    FTEventKey; $/;"	t
+FTEventTime	gui/ft_event.h	/^typedef time_t FTEventTime;$/;"	t
+FTEventType	gui/ft_event.h	/^} FTEventType;$/;"	t	typeref:enum:__anon3
+FTKeyEvent	gui/ft_event.h	/^typedef struct _FTKeyEvent  FTKeyEvent;$/;"	t	typeref:struct:_FTKeyEvent
+FTList	gui/ft_list.h	/^typedef struct _FTList FTList;$/;"	t	typeref:struct:_FTList
+FTPoint	gui/ft_draw.h	/^typedef struct _FTPoint     FTPoint;$/;"	t	typeref:struct:_FTPoint
+FTRect	gui/ft_draw.h	/^typedef struct _FTRect      FTRect;$/;"	t	typeref:struct:_FTRect
+FTWidget	gui/ft_widget.h	/^typedef struct _FTWidget FTWidget;$/;"	t	typeref:struct:_FTWidget
+FTWidgetDraw	gui/ft_widget.h	/^typedef void (*FTWidgetDraw)(FTWidget *widget);$/;"	t
+FTWidgetStatus	gui/ft_widget.h	/^} FTWidgetStatus;$/;"	t	typeref:enum:__anon1
+FTWidgetType	gui/ft_widget.h	/^typedef int FTWidgetType;$/;"	t
+FTWindow	gui/ft_window.h	/^typedef struct _FTWindow FTWindow;$/;"	t	typeref:struct:_FTWindow
+FT_FAIL	ft_type.h	6;"	d
+FT_FONT_H	gui/ft_draw.h	8;"	d
+FT_FONT_W	gui/ft_draw.h	7;"	d
+FT_KEY_BACK	gui/ft_event.h	10;"	d
+FT_KEY_DIAL	gui/ft_event.h	11;"	d
+FT_KEY_END	gui/ft_event.h	12;"	d
+FT_KEY_HOME	gui/ft_event.h	9;"	d
+FT_KEY_OK	gui/ft_event.h	13;"	d
+FT_SUCCESS	ft_type.h	5;"	d
+FW_STATUS_FOCUSED	gui/ft_widget.h	/^    FW_STATUS_FOCUSED,$/;"	e	enum:__anon1
+FW_STATUS_INSENSITIVE	gui/ft_widget.h	/^    FW_STATUS_INSENSITIVE,$/;"	e	enum:__anon1
+FW_STATUS_INVISIBLE	gui/ft_widget.h	/^    FW_STATUS_INVISIBLE,$/;"	e	enum:__anon1
+FW_STATUS_NORMAL	gui/ft_widget.h	/^    FW_STATUS_NORMAL = 0,$/;"	e	enum:__anon1
+FW_TYPE_BUTTON	gui/ft_widget.h	/^    FW_TYPE_BUTTON,$/;"	e	enum:__anon2
+FW_TYPE_WINDOW	gui/ft_widget.h	/^    FW_TYPE_WINDOW = 0,$/;"	e	enum:__anon2
+KEY_INPUT_DEVICE	gui/ft_input.c	9;"	d	file:
+LOCAL_MODULE	Android.mk	/^LOCAL_MODULE := factory_test$/;"	m
+LOCAL_PATH	Android.mk	/^LOCAL_PATH:= $(call my-dir)$/;"	m
+LOCAL_SRC_FILES	Android.mk	/^LOCAL_SRC_FILES:= \\$/;"	m
+MAX	gui/ft_draw.c	67;"	d	file:
+MIN	gui/ft_draw.c	68;"	d	file:
+_FBSurface	gui/ft_framebuffer.h	/^struct _FBSurface$/;"	s
+_FEContext	gui/ft_event.c	/^struct _FEContext$/;"	s	file:
+_FTButton	gui/ft_button.h	/^struct _FTButton$/;"	s
+_FTColor	gui/ft_draw.h	/^struct _FTColor$/;"	s
+_FTDrawGC	gui/ft_draw.h	/^struct _FTDrawGC$/;"	s
+_FTEvent	gui/ft_event.h	/^struct _FTEvent$/;"	s
+_FTKeyEvent	gui/ft_event.h	/^struct _FTKeyEvent$/;"	s
+_FTList	gui/ft_list.h	/^struct _FTList$/;"	s
+_FTPoint	gui/ft_draw.h	/^struct _FTPoint$/;"	s
+_FTRect	gui/ft_draw.h	/^struct _FTRect$/;"	s
+_FTWidget	gui/ft_widget.h	/^struct _FTWidget$/;"	s
+_FTWindow	gui/ft_window.h	/^struct _FTWindow$/;"	s
+_FT_BUTTON_H_	gui/ft_button.h	6;"	d
+_FT_DRAW_H_	gui/ft_draw.h	5;"	d
+_FT_EVENTS_H_	gui/ft_event.h	5;"	d
+_FT_FRAME_BUFFER_H_	gui/ft_framebuffer.h	5;"	d
+_FT_INPUT_H_	gui/ft_input.h	3;"	d
+_FT_LIST_H_	gui/ft_list.h	3;"	d
+_FT_TYPE_H_	ft_type.h	3;"	d
+_FT_WIDGET_H_	gui/ft_widget.h	6;"	d
+_FT_WINDOW_H_	gui/ft_window.h	5;"	d
+alpha	gui/ft_draw.h	/^    int alpha;$/;"	m	struct:_FTColor
+b	gui/ft_draw.h	/^    int r, g, b;$/;"	m	struct:_FTColor
+background	gui/ft_draw.h	/^    FTColor background;$/;"	m	struct:_FTDrawGC
+buffer	gui/ft_framebuffer.c	/^    char                       *buffer;$/;"	m	struct:FBContext	file:
+buffer	gui/ft_framebuffer.h	/^    char   *buffer;$/;"	m	struct:_FBSurface
+buffer	gui/ft_window.h	/^    char       *buffer;$/;"	m	struct:_FTWindow
+children	gui/ft_window.h	/^    FTList     *children;$/;"	m	struct:_FTWindow
+data	gui/ft_button.h	/^    void       *data;$/;"	m	struct:_FTButton
+data	gui/ft_list.h	/^    void   *data;$/;"	m	struct:_FTList
+depth	gui/ft_framebuffer.h	/^    int     depth;$/;"	m	struct:_FBSurface
+draw	gui/ft_widget.h	/^    FTWidgetDraw    draw;$/;"	m	struct:_FTWidget
+event	gui/ft_event.h	/^    FTEvent     event;$/;"	m	struct:_FTKeyEvent
+events	gui/ft_event.c	/^    FTList         *events;$/;"	m	struct:_FEContext	file:
+fb_context	gui/ft_framebuffer.c	/^struct FBContext fb_context;$/;"	v	typeref:struct:FBContext
+fb_fontdata_8x16	gui/libfbx-font-8x16.h	/^static unsigned char fb_fontdata_8x16[FONT_SIZE_8x16] = {$/;"	v
+fb_make_color_15	gui/ft_draw.c	/^int fb_make_color_15(int g, int b, int r)$/;"	f
+fb_make_color_16	gui/ft_draw.c	/^int fb_make_color_16(int g, int b, int r)$/;"	f
+fd	gui/ft_framebuffer.c	/^    int                         fd;$/;"	m	struct:FBContext	file:
+fe_context	gui/ft_event.c	/^static FEContext fe_context;$/;"	v	file:
+finfo	gui/ft_framebuffer.c	/^    struct fb_fix_screeninfo    finfo;$/;"	m	struct:FBContext	typeref:struct:FBContext::fb_fix_screeninfo	file:
+focus	gui/ft_widget.h	/^    int             focus;$/;"	m	struct:_FTWidget
+focus	gui/ft_window.h	/^    FTWidget   *focus;$/;"	m	struct:_FTWindow
+font_size	gui/ft_draw.h	/^    int     font_size;$/;"	m	struct:_FTDrawGC
+foreground	gui/ft_draw.h	/^    FTColor foreground;$/;"	m	struct:_FTDrawGC
+ft_button_draw	gui/ft_button.c	/^void ft_button_draw(FTWidget *widget)$/;"	f
+ft_button_new	gui/ft_button.c	/^FTButton *ft_button_new(const char *text)$/;"	f
+ft_button_set_handler	gui/ft_button.c	/^void ft_button_set_handler(FTButton *button, FBHandler handler, void *data)$/;"	f
+ft_button_set_text	gui/ft_button.c	/^void ft_button_set_text(FTButton *button, const char *text)$/;"	f
+ft_draw_box	gui/ft_draw.c	/^int ft_draw_box(FBSurface *s, FTRect *rect, FTDrawGC *gc, int fill)$/;"	f
+ft_draw_char	gui/ft_draw.c	/^int ft_draw_char(FBSurface *s, FTPoint *point, char c, FTDrawGC *gc)$/;"	f
+ft_draw_cleanup	gui/ft_draw.c	/^void ft_draw_cleanup(FBSurface *s)$/;"	f
+ft_draw_line	gui/ft_draw.c	/^int ft_draw_line(FBSurface *s, FTPoint *from, FTPoint *to, FTDrawGC *gc)$/;"	f
+ft_draw_point	gui/ft_draw.c	/^int ft_draw_point(FBSurface *s, FTPoint *point, FTDrawGC *gc)$/;"	f
+ft_draw_text	gui/ft_draw.c	/^int ft_draw_text(FBSurface *s, FTPoint *point, const char *text, FTDrawGC *gc)$/;"	f
+ft_event_clean	gui/ft_event.c	/^void ft_event_clean()$/;"	f
+ft_event_get	gui/ft_event.c	/^FTEvent *ft_event_get()$/;"	f
+ft_event_get_last	gui/ft_event.c	/^FTEvent *ft_event_get_last()$/;"	f
+ft_event_put	gui/ft_event.c	/^void ft_event_put(FTEvent *e)$/;"	f
+ft_event_set_key_handler	gui/ft_event.c	/^void ft_event_set_key_handler(FEKeyHandler func, void *data)$/;"	f
+ft_frame_buffer_close	gui/ft_framebuffer.c	/^void ft_frame_buffer_close()$/;"	f
+ft_frame_buffer_get_default	gui/ft_framebuffer.c	/^FBSurface *ft_frame_buffer_get_default()$/;"	f
+ft_frame_buffer_get_finfo	gui/ft_framebuffer.c	/^int ft_frame_buffer_get_finfo(struct fb_fix_screeninfo *finfo)$/;"	f
+ft_frame_buffer_get_vinfo	gui/ft_framebuffer.c	/^int ft_frame_buffer_get_vinfo(struct fb_var_screeninfo *vinfo)$/;"	f
+ft_list_append	gui/ft_list.c	/^FTList *ft_list_append(FTList *list, void *data)$/;"	f
+ft_list_delete	gui/ft_list.c	/^FTList *ft_list_delete(FTList *list, void *data)$/;"	f
+ft_list_first	gui/ft_list.c	/^FTList *ft_list_first(FTList *list)$/;"	f
+ft_list_free	gui/ft_list.c	/^void ft_list_free(FTList *list, int free_nodes)$/;"	f
+ft_list_insert	gui/ft_list.c	/^FTList *ft_list_insert(FTList *list, void *data, int position)$/;"	f
+ft_list_last	gui/ft_list.c	/^FTList *ft_list_last(FTList *list)$/;"	f
+ft_list_nth	gui/ft_list.c	/^FTList *ft_list_nth(FTList *list, int nth)$/;"	f
+ft_list_nth_data	gui/ft_list.c	/^void *ft_list_nth_data(FTList *list, int nth)$/;"	f
+ft_list_prepend	gui/ft_list.c	/^FTList *ft_list_prepend(FTList *list, void *data)$/;"	f
+ft_point_in_box	gui/ft_draw.c	/^int ft_point_in_box(FTPoint *point, FTRect *rect)$/;"	f
+ft_widget_destroy	gui/ft_widget.c	/^void ft_widget_destroy(FTWidget *widget)$/;"	f
+ft_widget_draw	gui/ft_widget.c	/^void ft_widget_draw(FTWidget *widget)$/;"	f
+ft_widget_get_visible	gui/ft_widget.c	/^int  ft_widget_get_visible(FTWidget *widget)$/;"	f
+ft_widget_init	gui/ft_widget.c	/^void ft_widget_init(FTWidget *widget, FTRect *rect, FTWidgetType type)$/;"	f
+ft_widget_init_default	gui/ft_widget.c	/^void ft_widget_init_default(FTWidget *widget)$/;"	f
+ft_widget_set_focus	gui/ft_widget.c	/^void ft_widget_set_focus(FTWidget *widget)$/;"	f
+ft_widget_set_visible	gui/ft_widget.c	/^void ft_widget_set_visible(FTWidget *widget, int visible)$/;"	f
+ft_widget_unset_focus	gui/ft_widget.c	/^void ft_widget_unset_focus(FTWidget *widget)$/;"	f
+ft_window_add_child	gui/ft_window.c	/^int ft_window_add_child(FTWindow *window, FTWidget *widget)$/;"	f
+ft_window_close	gui/ft_window.c	/^void ft_window_close(FTWindow *window)$/;"	f
+ft_window_draw	gui/ft_window.c	/^void ft_window_draw(FTWidget *widget)$/;"	f
+ft_window_layout	gui/ft_window.c	/^void ft_window_layout(FTWindow *window)$/;"	f
+ft_window_move_focus	gui/ft_window.c	/^void ft_window_move_focus(FTWindow *window, int orient)$/;"	f
+ft_window_new	gui/ft_window.c	/^FTWindow *ft_window_new()$/;"	f
+ftthread_create	gui/ft_thread.h	2;"	d
+ftthread_exit	gui/ft_thread.h	4;"	d
+ftthread_join	gui/ft_thread.h	3;"	d
+g	gui/ft_draw.h	/^    int r, g, b;$/;"	m	struct:_FTColor
+gc	gui/ft_widget.h	/^    FTDrawGC        gc;$/;"	m	struct:_FTWidget
+handler	gui/ft_button.h	/^    FBHandler   handler;$/;"	m	struct:_FTButton
+height	gui/ft_draw.h	/^    int width, height;$/;"	m	struct:_FTRect
+height	gui/ft_framebuffer.h	/^    int     height;$/;"	m	struct:_FBSurface
+id	gui/ft_event.h	/^    FTEventId   id;$/;"	m	struct:_FTEvent
+key	gui/ft_event.h	/^    FTEventKey  key;$/;"	m	struct:_FTKeyEvent
+key_data	gui/ft_event.c	/^    void           *key_data;$/;"	m	struct:_FEContext	file:
+key_func	gui/ft_event.c	/^    FEKeyHandler    key_func;$/;"	m	struct:_FEContext	file:
+list	gui/ft_widget.h	/^    FTList         *list;$/;"	m	struct:_FTWidget
+main	ft_main.c	/^int main(int argc, char *argv[])$/;"	f
+next	gui/ft_list.h	/^    FTList *next;$/;"	m	struct:_FTList
+on_key_event	gui/ft_window.c	/^static void on_key_event(FTKeyEvent *event, void *data)$/;"	f	file:
+prev	gui/ft_list.h	/^    FTList *prev;$/;"	m	struct:_FTList
+r	gui/ft_draw.h	/^    int r, g, b;$/;"	m	struct:_FTColor
+rect	gui/ft_widget.h	/^    FTRect          rect;$/;"	m	struct:_FTWidget
+screen_size	gui/ft_framebuffer.c	/^    int                         screen_size;$/;"	m	struct:FBContext	file:
+size	gui/ft_framebuffer.h	/^    int     size;$/;"	m	struct:_FBSurface
+status	gui/ft_widget.h	/^    FTWidgetStatus  status;$/;"	m	struct:_FTWidget
+surface	gui/ft_framebuffer.c	/^    FBSurface                   surface;$/;"	m	struct:FBContext	file:
+surface	gui/ft_widget.h	/^    FBSurface      *surface;$/;"	m	struct:_FTWidget
+text	gui/ft_button.h	/^    char       *text;$/;"	m	struct:_FTButton
+time	gui/ft_event.h	/^    FTEventTime time;$/;"	m	struct:_FTEvent
+type	gui/ft_event.h	/^    FTEventType type;$/;"	m	struct:_FTEvent
+type	gui/ft_widget.h	/^    FTWidgetType    type;$/;"	m	struct:_FTWidget
+vinfo	gui/ft_framebuffer.c	/^    struct fb_var_screeninfo    vinfo;$/;"	m	struct:FBContext	typeref:struct:FBContext::fb_var_screeninfo	file:
+visible	gui/ft_widget.h	/^    int             visible;$/;"	m	struct:_FTWidget
+wait_for_events	gui/ft_input.c	/^void wait_for_events()$/;"	f
+widget	gui/ft_button.h	/^    FTWidget    widget;$/;"	m	struct:_FTButton
+widget	gui/ft_window.h	/^    FTWidget    widget;$/;"	m	struct:_FTWindow
+width	gui/ft_draw.h	/^    int width, height;$/;"	m	struct:_FTRect
+width	gui/ft_framebuffer.h	/^    int     width;$/;"	m	struct:_FBSurface
+x	gui/ft_draw.h	/^    int x, y;$/;"	m	struct:_FTPoint
+x	gui/ft_draw.h	/^    int x, y;$/;"	m	struct:_FTRect
+y	gui/ft_draw.h	/^    int x, y;$/;"	m	struct:_FTPoint
+y	gui/ft_draw.h	/^    int x, y;$/;"	m	struct:_FTRect

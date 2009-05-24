@@ -1,0 +1,28 @@
+
+#include "ft_event.h"
+#include "ft_widget.h"
+
+#ifndef _FT_BUTTON_H_
+#define _FT_BUTTON_H_
+
+typedef struct _FTButton FTButton;
+
+typedef void (*FBHandler)(FTButton *button, FTEvent *event);
+
+struct _FTButton
+{
+    FTWidget    widget;
+    FBHandler   handler;
+    void       *data;
+    char       *text;
+};
+
+FTButton *ft_button_new(const char *text);
+
+void ft_button_draw(FTWidget *widget);
+
+void ft_button_set_handler(FTButton *button, FBHandler handler, void *data);
+
+void ft_button_set_text(FTButton *button, const char *text);
+
+#endif/*_FT_BUTTON_H_*/

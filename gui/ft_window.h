@@ -1,4 +1,5 @@
 #include "ft_list.h"
+#include "ft_event.h"
 #include "ft_widget.h"
 
 #ifndef _FT_WINDOW_H_
@@ -11,10 +12,14 @@ struct _FTWindow
     FTWidget    widget;
     FTWidget   *focus;
     FTList     *children;
+    FEHandler   handler;
+    void       *data;
     char       *buffer;
 };
 
 FTWindow *ft_window_new();
+
+FTWidget *ft_window_get_focus(FTWindow *window);
 
 int ft_window_add_child(FTWindow *window, FTWidget *child);
 

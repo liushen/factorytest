@@ -44,7 +44,7 @@ struct _FTKeyEvent
     FTEventKey  key;
 };
 
-typedef void (*FEKeyHandler)(FTKeyEvent *event, void *data);
+typedef void (*FEHandler)(FTEvent *event, void *data);
 
 FTEvent *ft_event_get();
 
@@ -52,7 +52,7 @@ FTEvent *ft_event_get_last();
 
 void ft_event_put(FTEvent *event);
 
-void ft_event_set_key_handler(FEKeyHandler func, void *data);
+void ft_event_set_key_handler(FEHandler func, void *data);
 
 void ft_event_clean();
 

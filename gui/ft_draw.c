@@ -6,6 +6,9 @@
 #include <string.h>
 #include <assert.h>
 
+#define MAX(x, y)   ((x)>(y))?(x):(y)
+#define MIN(x, y)   ((x)<(y))?(x):(y)
+
 int fb_make_color_15(int g, int b, int r)
 {
     r >>= 3;
@@ -36,7 +39,7 @@ int ft_draw_box(FBSurface *s, FTRect *rect, FTDrawGC *gc, int fill)
         b.x = rect->x + rect->width;
         b.y = rect->y;
 
-        for (; a.y < rect->y + rect->height; a.y++, b.y++)
+        for (; a.y <= rect->y + rect->height; a.y++, b.y++)
         {
             ft_draw_line(s, &a, &b, gc);
         }
@@ -64,9 +67,6 @@ int ft_draw_box(FBSurface *s, FTRect *rect, FTDrawGC *gc, int fill)
     return FT_SUCCESS;
 }
 
-#define MAX(x, y)   ((x)>(y))?(x):(y)
-#define MIN(x, y)   ((x)<(y))?(x):(y)
-
 int ft_draw_line(FBSurface *s, FTPoint *from, FTPoint *to, FTDrawGC *gc)
 {
     assert (from->x == to->x || from->y == to->y);
@@ -80,7 +80,7 @@ int ft_draw_line(FBSurface *s, FTPoint *from, FTPoint *to, FTDrawGC *gc)
         b = MAX(from->y, to->y);
         p.x = from->x;
 
-        for (i = a; i < b; i++)
+        for (i = a; i <= b; i++)
         {
             p.y = i;
             ft_draw_point(s, &p, gc);
@@ -92,7 +92,7 @@ int ft_draw_line(FBSurface *s, FTPoint *from, FTPoint *to, FTDrawGC *gc)
         b = MAX(from->x, to->x);
         p.y = from->y;
 
-        for (i = a; i < b; i++)
+        for (i = a; i <= b; i++)
         {
             p.x = i;
             ft_draw_point(s, &p, gc);

@@ -1,10 +1,18 @@
 #include "ft_window.h"
-#include "ft_event.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
-static void on_key_event(FTKeyEvent *event, void *data);
+typedef struct _FWContext FWContext;
+
+struct _FWContext
+{
+    FTList *windows;
+};
+
+static FWContext fw_context;
+
+static void ft_window_event_handler(FTEvent *event, void *data);
 
 FTWindow *ft_window_new()
 {
@@ -24,6 +32,9 @@ FTWindow *ft_window_new()
     widget->rect.height = widget->surface->height;
 
     window->buffer = malloc(widget->surface->size);
+
+    window->handler = ft_window_event_handler;
+    window->data = window;
 
     return window;
 }
@@ -69,7 +80,7 @@ void ft_window_draw(FTWidget *widget)
 
     memcpy(window->buffer, widget->surface->buffer, widget->surface->size);
 
-    ft_event_set_key_handler(on_key_event, window);
+    ft_event_set_key_handler(window->handler, window->data);
 
     window->focus = ft_window_get_focus(window);
 }
@@ -153,15 +164,15 @@ void ft_window_close(FTWindow *window)
 {
 }
 
-static void on_key_event(FTKeyEvent *event, void *data)
+static void ft_window_event_handler(FTEvent *event, void *data)
 {
     FTWindow *window = (FTWindow *)data;
 
-    FTEvent *e = (FTEvent *)event;
-
-    if (e->type == FE_KEY_RELEASE)
+    if (event->type == FE_KEY_RELEASE)
     {
-        switch (event->key)
+        FTKeyEvent *e = (FTKeyEvent *)event;
+
+        switch (e->key)
         {
             case FT_KEY_DIAL:
                 ft_window_move_focus(window, 1);

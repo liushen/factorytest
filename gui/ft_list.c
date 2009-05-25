@@ -71,7 +71,7 @@ FTList *ft_list_insert(FTList *list, void *data, int position)
         list->prev = node;
     }
 
-    return node;
+    return ft_list_first(node);
 }
 
 FTList *ft_list_delete(FTList *list, void *data)
@@ -96,7 +96,7 @@ FTList *ft_list_delete(FTList *list, void *data)
         }
     }
 
-    return list;
+    return ft_list_first(list);
 }
 
 FTList *ft_list_nth(FTList *list, int nth)
@@ -108,6 +108,19 @@ FTList *ft_list_nth(FTList *list, int nth)
     while (list && list->next && i++ < nth) list = list->next;
 
     return list;
+}
+
+FTList *ft_list_find(FTList *list, void *data)
+{
+    FTList *iter = ft_list_first(list);
+
+    for (; iter; iter = iter->next)
+    {
+        if (iter->data == data) 
+            break;
+    }
+
+    return iter;
 }
 
 void *ft_list_nth_data(FTList *list, int nth)

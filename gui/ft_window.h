@@ -12,8 +12,6 @@ struct _FTWindow
     FTWidget    widget;
     FTWidget   *focus;
     FTList     *children;
-    FEHandler   handler;
-    void       *data;
     char       *buffer;
 };
 

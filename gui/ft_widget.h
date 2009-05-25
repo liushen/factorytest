@@ -1,6 +1,7 @@
 #include "ft_type.h"
 #include "ft_draw.h"
 #include "ft_list.h"
+#include "ft_event.h"
 
 #ifndef _FT_WIDGET_H_
 #define _FT_WIDGET_H_
@@ -10,6 +11,7 @@ typedef int FTWidgetType;
 typedef struct _FTWidget FTWidget;
 
 typedef void (*FTWidgetDraw)(FTWidget *widget);
+typedef void (*FTWidgetDestroy)(FTWidget *widget);
 
 typedef enum
 {
@@ -29,7 +31,11 @@ struct _FTWidget
 {
     FTWidgetStatus  status;
     FTWidgetType    type;
-    FTWidgetDraw    draw;
+    FTWidgetDraw    draw;       /* required */
+    FTWidgetDestroy destroy;    /* required */
+    FEHandler       handler;
+    void           *data;
+
     FBSurface      *surface;
     FTDrawGC        gc;
     FTRect          rect;

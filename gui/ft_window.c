@@ -13,6 +13,7 @@ struct _FWContext
 static FWContext fw_context;
 
 static void ft_window_event_handler(FTEvent *event, void *data);
+static void ft_window_destroy(FTWidget *widget);
 
 FTWindow *ft_window_new()
 {
@@ -33,8 +34,11 @@ FTWindow *ft_window_new()
 
     window->buffer = malloc(widget->surface->size);
 
-    window->handler = ft_window_event_handler;
-    window->data = window;
+    widget->destroy = ft_window_destroy;
+    widget->handler = ft_window_event_handler;
+    widget->data = window;
+
+    fw_context.windows = ft_list_append(fw_context.windows, window);
 
     return window;
 }
@@ -80,7 +84,7 @@ void ft_window_draw(FTWidget *widget)
 
     memcpy(window->buffer, widget->surface->buffer, widget->surface->size);
 
-    ft_event_set_key_handler(window->handler, window->data);
+    ft_event_set_key_handler(widget->handler, widget->data);
 
     window->focus = ft_window_get_focus(window);
 }
@@ -116,21 +120,18 @@ FTWidget *ft_window_get_focus(FTWindow *window)
 
 void ft_window_move_focus(FTWindow *window, int orient)
 {
-    FTList *iter = window->children;
-    FTWidget *widget = NULL;
+    FTWidget *widget;
+    FTList *iter;
 
-    if (!iter)
+    widget = ft_window_get_focus(window);
+
+    if (!widget)
         return;
+
+    iter = ft_list_find(window->children, widget);
 
     if (orient > 0)
     {
-        for (; iter; iter = iter->next)
-        {
-            widget = (FTWidget *)iter->data;
-
-            if (widget->focus) break;
-        }
-
         if (iter && iter->next)
             iter = iter->next;
         else
@@ -138,50 +139,142 @@ void ft_window_move_focus(FTWindow *window, int orient)
     }
     else
     {
-        iter = ft_list_last(iter);
-
-        for (; iter; iter = iter->prev)
-        {
-            widget = (FTWidget *)iter->data;
-
-            if (widget->focus) break;
-        }
-
         if (iter && iter->prev)
             iter = iter->prev;
         else
             iter = ft_list_last(window->children);
     }
 
-    if (widget) 
-        ft_widget_unset_focus(widget);
-
     window->focus = (FTWidget *)iter->data;
+
     ft_widget_set_focus(window->focus);
+    ft_widget_unset_focus(widget);
 }
 
 void ft_window_close(FTWindow *window)
 {
+    assert(window != NULL);
+
+    FTList *last = ft_list_last(fw_context.windows);
+
+    ft_window_destroy((FTWidget *)window);
+
+    if (window == last->data)
+    {
+        if (last->prev)
+            ft_window_draw((FTWidget *)last->prev->data);
+        else
+            exit(FT_SUCCESS);
+    }
+
+    fw_context.windows = ft_list_delete(fw_context.windows, window);
+}
+
+static void ft_window_destroy(FTWidget *widget)
+{
+    FTWindow *window = (FTWindow *)widget;
+    FTList *iter = window->children;
+
+    for (; iter; iter = iter->next)
+    {
+        FTWidget *w = (FTWidget *)iter->data;
+
+        w->destroy(w);
+    }
+
+    free(window->buffer);
+    free(window);
+}
+
+static FTWidget *ft_window_find_widget(FTWindow *window, FTPoint *point)
+{
+    FTWidget *widget = NULL;
+    FTList *iter = window->children;
+
+    for (; iter; iter = iter->next)
+    {
+        widget = (FTWidget *)iter->data;
+
+        if (ft_point_in_box(point, &widget->rect))
+        {
+            return widget;
+        }
+    }
+
+    return NULL;
 }
 
 static void ft_window_event_handler(FTEvent *event, void *data)
 {
     FTWindow *window = (FTWindow *)data;
 
-    if (event->type == FE_KEY_RELEASE)
+    FTMouseEvent *me;
+    FTKeyEvent *ke;
+    FTPoint point;
+    FTWidget *w;
+
+    switch (event->type)
     {
-        FTKeyEvent *e = (FTKeyEvent *)event;
+        case FE_KEY_RELEASE:
+            ke = (FTKeyEvent *)event;
 
-        switch (e->key)
-        {
-            case FT_KEY_DIAL:
+            if (ke->key == FT_KEY_OK)
+            {
+                w = ft_window_get_focus(window);
+
+                if (w && w->handler)
+                {
+                    w->handler(event, w->data);
+                }
+            }
+            else if (ke->key == FT_KEY_DIAL)
+            {
                 ft_window_move_focus(window, 1);
-                break;
-
-            case FT_KEY_END:
+            }
+            else if (ke->key == FT_KEY_END)
+            {
                 ft_window_move_focus(window, -1);
-                break;
-        }
+            }
+            else if (ke->key == FT_KEY_BACK)
+            {
+                ft_window_close(window);
+            }
+
+            break;
+
+        case FE_MOUSE_PRESS:
+            me = (FTMouseEvent *)event;
+
+            point.x = me->x;
+            point.y = me->y;
+
+            w = ft_window_find_widget(window, &point);
+
+            w = ft_window_find_widget(window, &point);
+
+            if (w && w->handler && w->visible)
+            {
+                //TODO
+            }
+
+            break;
+
+        case FE_MOUSE_RELEASE:
+            me = (FTMouseEvent *)event;
+
+            point.x = me->x;
+            point.y = me->y;
+
+            w = ft_window_find_widget(window, &point);
+
+            if (w && w->handler && w->visible)
+            {
+                w->handler(event, w->data);
+            }
+
+            break;
+
+        default: break;
     }
 }
 

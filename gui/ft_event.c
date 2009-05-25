@@ -24,16 +24,9 @@ FTEvent *ft_event_get_last()
 
 void ft_event_put(FTEvent *e)
 {
-    if (e->type < FE_MOUSE_EVENT)
+    if (fe_context.handler)
     {
-        if (fe_context.handler)
-        {
-            fe_context.handler(e, fe_context.data);
-        }
-    }
-    else
-    {
-        //TODO
+        fe_context.handler(e, fe_context.data);
     }
 }
 

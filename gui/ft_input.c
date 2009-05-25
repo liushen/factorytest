@@ -6,22 +6,82 @@
 #include <sys/types.h>
 #include <linux/input.h>
 
-#define KEY_INPUT_DEVICE    "/dev/input/event0"
+#define FT_INPUT_DEVICE     "/dev/input/event0"
+#define BUFFER_SIZE         64
+#define EVENT_SIZE          sizeof(struct input_event)
 
 void wait_for_events()
 {
-    struct input_event e;
-    FTKeyEvent key;
-    fd_set rfds;
-    int fd;
+    static struct input_event events[BUFFER_SIZE];
+    struct input_event *e;
 
-    fd = open(KEY_INPUT_DEVICE, O_RDONLY);
+    FTMouseEvent me;
+    FTKeyEvent ke;
+    FTEvent *event;
+
+    int fd, byte, i;
+    int x = 0, y = 0;
+
+    fd = open(FT_INPUT_DEVICE, O_RDONLY);
 
     if (!fd)
     {
-        perror("open()");
+        perror("open "FT_INPUT_DEVICE);
         return;
     }
+
+    while (1)
+    {
+        byte = read(fd, events, EVENT_SIZE * BUFFER_SIZE);
+
+        if (byte < EVENT_SIZE)
+            continue;
+
+        for (i = 0; i < byte / EVENT_SIZE; i++)
+        {
+            e = &events[i];
+
+            switch (e->type)
+            {
+                case EV_ABS:
+                    if (e->code == 0)
+                        x = e->value;
+                    else
+                        y = e->value;
+
+                    break;
+
+                case EV_KEY:
+                    if (e->code == FT_KEY_MOUSE)
+                    {
+                        //printf("type=%d, code=%d, value=%d, x=%d, y=%d\n", 
+                        //        e->type, e->code, e->value, x, y);
+
+                        event = (FTEvent *)&me;
+                        event->type = e->value ? FE_MOUSE_PRESS : FE_MOUSE_RELEASE;
+
+                        me.x = x;
+                        me.y = y;
+
+                        ft_event_put(event);
+                    }
+                    else
+                    {
+                        event = (FTEvent *)&ke;
+                        event->type = e->value ? FE_KEY_PRESS : FE_KEY_RELEASE;
+
+                        ke.key = e->code;
+
+                        ft_event_put(event);
+                    }
+
+                    break;
+            }
+        }
+    }
+
+#if 0
+    fd_set rfds;
 
     FD_ZERO(&rfds);
     FD_SET(fd, &rfds);
@@ -60,5 +120,6 @@ void wait_for_events()
             }
         }
     }
+#endif
 }
 

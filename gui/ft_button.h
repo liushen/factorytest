@@ -7,7 +7,7 @@
 
 typedef struct _FTButton FTButton;
 
-typedef void (*FBHandler)(FTButton *button, FTEvent *event);
+typedef void (*FBHandler)(FTButton *button, void *data);
 
 struct _FTButton
 {
@@ -18,8 +18,6 @@ struct _FTButton
 };
 
 FTButton *ft_button_new(const char *text);
-
-void ft_button_draw(FTWidget *widget);
 
 void ft_button_set_handler(FTButton *button, FBHandler handler, void *data);
 

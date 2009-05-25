@@ -11,13 +11,15 @@
 #define FT_KEY_DIAL     (231)
 #define FT_KEY_END      (107)
 #define FT_KEY_OK       (232)
+#define FT_KEY_MOUSE    (330)
 
 typedef int    FTEventId; 
 typedef int    FTEventKey; 
 typedef time_t FTEventTime;
 
-typedef struct _FTEvent     FTEvent;
-typedef struct _FTKeyEvent  FTKeyEvent;
+typedef struct _FTEvent         FTEvent;
+typedef struct _FTKeyEvent      FTKeyEvent;
+typedef struct _FTMouseEvent    FTMouseEvent;
 
 typedef enum
 {
@@ -26,6 +28,10 @@ typedef enum
     FE_KEY_RELEASE,
 
     FE_MOUSE_EVENT,
+    FE_MOUSE_PRESS,
+    FE_MOUSE_RELEASE,
+
+    FE_UI_EVENT,
     FE_FOCUS_CHANGED,
     FE_BUTTON_CLICKED,
     FE_BUTTON_FOCUSED,
@@ -42,6 +48,13 @@ struct _FTKeyEvent
 {
     FTEvent     event;
     FTEventKey  key;
+};
+
+struct _FTMouseEvent
+{
+    FTEvent     event;
+    FTEventKey  key;
+    int         x, y;
 };
 
 typedef void (*FEHandler)(FTEvent *event, void *data);

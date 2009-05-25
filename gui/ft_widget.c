@@ -43,11 +43,10 @@ void ft_widget_set_visible(FTWidget *widget, int visible)
     ft_draw_box(widget->surface, &widget->rect, &gc, 1);
 
     if (visible)
-    {
         widget->draw(widget);
-    }
 
     widget->visible = visible;
+    widget->focus = visible ? widget->focus : 0;
 }
 
 int  ft_widget_get_visible(FTWidget *widget)
@@ -96,21 +95,26 @@ void ft_widget_unset_focus(FTWidget *widget)
 
 void ft_widget_draw(FTWidget *widget)
 {
+    FTDrawGC gc;
+   
     if (!widget->visible)
         return;
-
-    ft_draw_box(widget->surface, &widget->rect, &widget->gc, 0);
-}
-
-void ft_widget_destroy(FTWidget *widget)
-{
-    FTDrawGC gc;
 
     gc.foreground = widget->gc.background;
     gc.background = widget->gc.background;
 
     ft_draw_box(widget->surface, &widget->rect, &gc, 1);
+    ft_draw_box(widget->surface, &widget->rect, &widget->gc, 0);
 
-    free(widget);
+    if (widget->focus)
+    {
+        ft_widget_set_focus(widget);
+    }
+}
+
+void ft_widget_destroy(FTWidget *widget)
+{
+    if (widget->destroy)
+        widget->destroy(widget);
 }
 

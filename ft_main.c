@@ -62,7 +62,9 @@ int main(int argc, char *argv[])
     ft_window_add_child(win, (FTWidget *)btn);
 
     ft_window_draw(win);
-    ft_widget_set_visible(btn, 0);
+    //ft_widget_set_visible(btn, 0);
+
+    ft_button_set_text(btn, "New Text");
 /*
     FTPoint p = {0, 0};
     ft_draw_text(s, &p, "Hello world! 0123456789", &gc);

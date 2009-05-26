@@ -30,7 +30,7 @@ void ft_event_put(FTEvent *e)
     }
 }
 
-void ft_event_set_key_handler(FEHandler func, void *data)
+void ft_event_set_handler(FEHandler func, void *data)
 {
     fe_context.handler = func;
     fe_context.data = data;

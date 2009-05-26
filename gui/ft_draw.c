@@ -36,10 +36,10 @@ int ft_draw_box(FBSurface *s, FTRect *rect, FTDrawGC *gc, int fill)
         a.x = rect->x;
         a.y = rect->y;
 
-        b.x = rect->x + rect->width;
+        b.x = rect->x + rect->width - 1;
         b.y = rect->y;
 
-        for (; a.y <= rect->y + rect->height; a.y++, b.y++)
+        for (; a.y < rect->y + rect->height; a.y++, b.y++)
         {
             ft_draw_line(s, &a, &b, gc);
         }
@@ -49,14 +49,14 @@ int ft_draw_box(FBSurface *s, FTRect *rect, FTDrawGC *gc, int fill)
         a.x = rect->x;
         a.y = rect->y;
 
-        b.x = rect->x + rect->width;
+        b.x = rect->x + rect->width - 1;
         b.y = rect->y;
 
-        c.x = rect->x + rect->width;
-        c.y = rect->y + rect->height;
+        c.x = rect->x + rect->width  - 1;
+        c.y = rect->y + rect->height - 1;
 
         d.x = rect->x;
-        d.y = rect->y + rect->height;
+        d.y = rect->y + rect->height - 1;
 
         ft_draw_line(s, &a, &b, gc);
         ft_draw_line(s, &b, &c, gc);

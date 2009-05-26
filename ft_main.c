@@ -1,82 +1,102 @@
 #include "ft_type.h"
+#include "ft_keyboard.h"
+#include "ft_matrix.h"
+#include "ft_lcdcolor.h"
 #include "gui/ft_input.h"
-#include "gui/ft_draw.h"
 #include "gui/ft_window.h"
 #include "gui/ft_button.h"
-#include "gui/ft_framebuffer.h"
+
+static void on_keyboard_handler(FTButton *button, void *data)
+{
+    FTWindow *window = ft_keyboard_new();
+    ft_window_show(window);
+}
+
+static void on_matrix_handler(FTButton *button, void *data)
+{
+    FTWindow *window = ft_matrix_new();
+    ft_window_show(window);
+}
+
+static void on_lcdcolor_handler(FTButton *button, void *data)
+{
+    FTWindow *window = ft_lcdcolor_new();
+    ft_window_show(window);
+}
 
 int main(int argc, char *argv[])
 {
-    FBSurface *s = ft_frame_buffer_get_default();
-    FTRect rect = {10, 10, 60, 60};
-    FTRect rect1 = {0};
-    FTDrawGC gc = {{255, 255, 255, 0}, {0, 0, 0, 0}, 0};
-    int i;
+    FTWindow *window;
+    FTButton *button;
 
-    FTWindow *win = ft_window_new();
+    window = ft_window_new();
 
-    FTButton *btn = ft_button_new("Version");
-    ft_window_add_child(win, (FTWidget *)btn);
-    ft_widget_set_focus(btn);
+    button = ft_button_new("Version");
+    ft_window_add_child(window, (FTWidget *)button);
+    ft_widget_set_focus((FTWidget *)button);
 
-    btn = ft_button_new("Echoloop");
-    ft_window_add_child(win, (FTWidget *)btn);
+    button = ft_button_new("Echoloop");
+    ft_window_add_child(window, (FTWidget *)button);
 
-    btn = ft_button_new("Vibrator");
-    ft_window_add_child(win, (FTWidget *)btn);
+    button = ft_button_new("Key");
+    ft_button_set_handler(button, on_keyboard_handler, button);
+    ft_window_add_child(window, (FTWidget *)button);
 
-    btn = ft_button_new("Loud SPK");
-    ft_window_add_child(win, (FTWidget *)btn);
+    button = ft_button_new("Vibrator");
+    ft_window_add_child(window, (FTWidget *)button);
 
-    btn = ft_button_new("Ring");
-    ft_window_add_child(win, (FTWidget *)btn);
+    button = ft_button_new("Loud SPK");
+    ft_window_add_child(window, (FTWidget *)button);
 
-    btn = ft_button_new("LED");
-    ft_window_add_child(win, (FTWidget *)btn);
+    button = ft_button_new("Ring");
+    ft_window_add_child(window, (FTWidget *)button);
 
-    btn = ft_button_new("LCD");
-    ft_window_add_child(win, (FTWidget *)btn);
+    button = ft_button_new("LED");
+    ft_window_add_child(window, (FTWidget *)button);
 
-    btn = ft_button_new("Contrast");
-    ft_window_add_child(win, (FTWidget *)btn);
+    button = ft_button_new("LCD");
+    ft_button_set_handler(button, on_lcdcolor_handler, button);
+    ft_window_add_child(window, (FTWidget *)button);
 
-    btn = ft_button_new("Receiver");
-    ft_window_add_child(win, (FTWidget *)btn);
+    button = ft_button_new("Contrast");
+    ft_window_add_child(window, (FTWidget *)button);
 
-    btn = ft_button_new("ADC");
-    ft_window_add_child(win, (FTWidget *)btn);
+    button = ft_button_new("Receiver");
+    ft_window_add_child(window, (FTWidget *)button);
 
-    btn = ft_button_new("Charger");
-    ft_window_add_child(win, (FTWidget *)btn);
+    button = ft_button_new("ADC");
+    ft_window_add_child(window, (FTWidget *)button);
 
-    btn = ft_button_new("Handset");
-    ft_window_add_child(win, (FTWidget *)btn);
+    button = ft_button_new("Charger");
+    ft_window_add_child(window, (FTWidget *)button);
 
-    btn = ft_button_new("RTC");
-    ft_window_add_child(win, (FTWidget *)btn);
+    button = ft_button_new("Handset");
+    ft_window_add_child(window, (FTWidget *)button);
 
-    btn = ft_button_new("Parell");
-    ft_window_add_child(win, (FTWidget *)btn);
+    button = ft_button_new("RTC");
+    ft_window_add_child(window, (FTWidget *)button);
 
-    btn = ft_button_new("M * M");
-    ft_window_add_child(win, (FTWidget *)btn);
+    button = ft_button_new("M * M");
+    ft_button_set_handler(button, on_matrix_handler, button);
+    ft_window_add_child(window, (FTWidget *)button);
 
-    ft_window_draw(win);
-    //ft_widget_set_visible(btn, 0);
+    button = ft_button_new("Camera");
+    ft_window_add_child(window, (FTWidget *)button);
 
-    ft_button_set_text(btn, "New Text");
-/*
-    FTPoint p = {0, 0};
-    ft_draw_text(s, &p, "Hello world! 0123456789", &gc);
+    button = ft_button_new("Bluetooth");
+    ft_window_add_child(window, (FTWidget *)button);
 
-    for (i = 0; i < 80; i++)
-    {
-        ft_draw_box(s, &rect, &gc, 1);
-        rect.x += 2;
-        rect.y += 2;
-        usleep(500);
-    }
-*/
+    button = ft_button_new("Wifi");
+    ft_window_add_child(window, (FTWidget *)button);
+
+    button = ft_button_new("FM");
+    ft_window_add_child(window, (FTWidget *)button);
+
+    button = ft_button_new("GPS");
+    ft_window_add_child(window, (FTWidget *)button);
+
+    ft_window_show(window);
+
     wait_for_events();
 
     ft_frame_buffer_close();

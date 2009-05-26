@@ -20,7 +20,7 @@ FTList *ft_list_append(FTList *list, void *data)
 {
     FTList *node = malloc(sizeof(FTList));
 
-    memset(node, 0, sizeof(node));
+    memset(node, 0, sizeof(FTList));
 
     list = ft_list_last(list);
 
@@ -39,7 +39,7 @@ FTList *ft_list_prepend(FTList *list, void *data)
 {
     FTList *node = malloc(sizeof(FTList));
 
-    memset(node, 0, sizeof(node));
+    memset(node, 0, sizeof(FTList));
 
     list = ft_list_first(list);
 
@@ -84,11 +84,14 @@ FTList *ft_list_delete(FTList *list, void *data)
     {
         if (iter->data == data)
         {
-            iter->prev->next = iter->next;
-            iter->next->prev = iter->prev;
+            if (iter->prev)
+                iter->prev->next = iter->next;
+
+            if (iter->next)
+                iter->next->prev = iter->prev;
             
             if (list == iter)
-                list = list->next;
+                list = iter->next ? iter->next : iter->prev;
 
             free(iter);
 

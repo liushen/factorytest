@@ -20,7 +20,7 @@ FTWindow *ft_window_new()
     FTWindow *window = malloc(sizeof(FTWindow));
     FTWidget *widget = (FTWidget *)window;
 
-    memset(window, 0, sizeof(window));
+    memset(window, 0, sizeof(FTWindow));
 
     ft_widget_init_default(widget);
 
@@ -68,10 +68,24 @@ void ft_window_layout(FTWindow *window)
     }
 }
 
+void ft_window_show(FTWindow *window)
+{
+    FTWidget *widget = (FTWidget *)window;
+
+    widget->draw(widget);
+
+    ft_event_set_handler(widget->handler, widget->data);
+
+    window->focus = ft_window_get_focus(window);
+}
+
 void ft_window_draw(FTWidget *widget)
 {
     FTWindow *window = (FTWindow *)widget;
     FTWidget *w;
+    FBSurface *s = widget->surface;
+
+    memset(s->buffer, 0, s->size);
 
     FTList *iter = window->children;
 
@@ -82,11 +96,7 @@ void ft_window_draw(FTWidget *widget)
         w->draw(w);
     }
 
-    memcpy(window->buffer, widget->surface->buffer, widget->surface->size);
-
-    ft_event_set_key_handler(widget->handler, widget->data);
-
-    window->focus = ft_window_get_focus(window);
+    memcpy(window->buffer, s->buffer, s->size);
 }
 
 int ft_window_add_child(FTWindow *window, FTWidget *widget)
@@ -112,23 +122,26 @@ FTWidget *ft_window_get_focus(FTWindow *window)
     {
         widget = (FTWidget *)iter->data;
 
-        if (widget->focus) break;
+        if (widget->focus)
+        {
+            return widget;
+        }
     }
 
-    return widget;
+    return NULL;
 }
 
 void ft_window_move_focus(FTWindow *window, int orient)
 {
-    FTWidget *widget;
-    FTList *iter;
+    FTWidget *widget = NULL;
+    FTList *iter = NULL;
 
     widget = ft_window_get_focus(window);
 
-    if (!widget)
-        return;
-
-    iter = ft_list_find(window->children, widget);
+    if (widget)
+    {
+        iter = ft_list_find(window->children, widget);
+    }
 
     if (orient > 0)
     {
@@ -147,8 +160,10 @@ void ft_window_move_focus(FTWindow *window, int orient)
 
     window->focus = (FTWidget *)iter->data;
 
+    if (widget)
+        ft_widget_unset_focus(widget);
+
     ft_widget_set_focus(window->focus);
-    ft_widget_unset_focus(widget);
 }
 
 void ft_window_close(FTWindow *window)
@@ -162,7 +177,7 @@ void ft_window_close(FTWindow *window)
     if (window == last->data)
     {
         if (last->prev)
-            ft_window_draw((FTWidget *)last->prev->data);
+            ft_window_show((FTWindow *)last->prev->data);
         else
             exit(FT_SUCCESS);
     }
@@ -227,7 +242,7 @@ static void ft_window_event_handler(FTEvent *event, void *data)
                     w->handler(event, w->data);
                 }
             }
-            else if (ke->key == FT_KEY_DIAL)
+            else if (ke->key == FT_KEY_SEND)
             {
                 ft_window_move_focus(window, 1);
             }
@@ -250,11 +265,17 @@ static void ft_window_event_handler(FTEvent *event, void *data)
 
             w = ft_window_find_widget(window, &point);
 
-            w = ft_window_find_widget(window, &point);
-
             if (w && w->handler && w->visible)
             {
-                //TODO
+                if (w != window->focus)
+                {
+                    if (window->focus)
+                        ft_widget_unset_focus(window->focus);
+
+                    ft_widget_set_focus(w);
+
+                    window->focus = w;
+                }
             }
 
             break;

@@ -21,6 +21,8 @@ FTWidget *ft_window_get_focus(FTWindow *window);
 
 int ft_window_add_child(FTWindow *window, FTWidget *child);
 
+void ft_window_show(FTWindow *window);
+
 void ft_window_draw(FTWidget *widget);
 
 void ft_window_move_focus(FTWindow *window, int orient);

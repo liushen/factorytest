@@ -11,7 +11,7 @@ FTButton *ft_button_new(const char *text)
     FTButton *button = malloc(sizeof(FTButton));
     FTWidget *widget = (FTWidget *)button;
 
-    memset(button, 0, sizeof(button));
+    memset(button, 0, sizeof(FTButton));
 
     ft_widget_init_default(widget);
 

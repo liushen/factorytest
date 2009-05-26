@@ -8,9 +8,15 @@
 
 #define FT_KEY_HOME     (102)
 #define FT_KEY_BACK     (158)
-#define FT_KEY_DIAL     (231)
+#define FT_KEY_SEND     (231)
 #define FT_KEY_END      (107)
 #define FT_KEY_OK       (232)
+#define FT_KEY_MENU     (229)
+
+#define FT_KEY_VOL_ADD  (114)
+#define FT_KEY_VOL_SUB  (115)
+#define FT_KEY_POWER    (116)
+
 #define FT_KEY_MOUSE    (330)
 
 typedef int    FTEventId; 
@@ -65,7 +71,7 @@ FTEvent *ft_event_get_last();
 
 void ft_event_put(FTEvent *event);
 
-void ft_event_set_key_handler(FEHandler func, void *data);
+void ft_event_set_handler(FEHandler func, void *data);
 
 void ft_event_clean();
 

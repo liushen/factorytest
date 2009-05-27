@@ -21,6 +21,7 @@ FTButton *ft_button_new(const char *text)
     widget->handler = ft_button_event_handler;
     widget->data = widget;
 
+    button->color = widget->gc.foreground;
     button->text = strdup(text);
 
     return button;
@@ -41,9 +42,17 @@ void ft_button_set_text(FTButton *button, const char *text)
     ft_button_draw((FTWidget *)button);
 }
 
+void ft_button_set_color(FTButton *button, FTColor *color)
+{
+    button->color = *color;
+
+    ft_button_draw((FTWidget *)button);
+}
+
 static void ft_button_draw(FTWidget *widget)
 {
     FTButton *button = (FTButton *)widget;
+    FTDrawGC gc = widget->gc;
     FTPoint point;
 
     if (!widget->visible)
@@ -54,7 +63,9 @@ static void ft_button_draw(FTWidget *widget)
     point.x = widget->rect.x + FT_FONT_W;
     point.y = widget->rect.y + FT_FONT_W;
 
-    ft_draw_text(widget->surface, &point, button->text, &widget->gc);
+    gc.foreground = button->color;
+
+    ft_draw_text(widget->surface, &point, button->text, &gc);
 }
 
 static void ft_button_destroy(FTWidget *widget)

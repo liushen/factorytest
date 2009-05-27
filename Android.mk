@@ -11,6 +11,10 @@ LOCAL_SRC_FILES:= \
 		gui/ft_list.c \
 		gui/ft_widget.c \
 		gui/ft_window.c \
+		hw/hw_comm.c \
+		hw/hw_audio.c \
+		hw/hw_led.c \
+		ft_textpad.c \
 		ft_keyboard.c \
 		ft_matrix.c \
 		ft_lcdcolor.c \

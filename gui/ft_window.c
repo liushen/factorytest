@@ -136,12 +136,13 @@ void ft_window_move_focus(FTWindow *window, int orient)
     FTWidget *widget = NULL;
     FTList *iter = NULL;
 
+    if (window->children == NULL)
+        return;
+
     widget = ft_window_get_focus(window);
 
     if (widget)
-    {
         iter = ft_list_find(window->children, widget);
-    }
 
     if (orient > 0)
     {

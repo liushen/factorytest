@@ -18,9 +18,7 @@ FTList *ft_list_last(FTList *list)
 
 FTList *ft_list_append(FTList *list, void *data)
 {
-    FTList *node = malloc(sizeof(FTList));
-
-    memset(node, 0, sizeof(FTList));
+    FTList *node = calloc(1, sizeof(FTList));
 
     list = ft_list_last(list);
 
@@ -37,9 +35,7 @@ FTList *ft_list_append(FTList *list, void *data)
 
 FTList *ft_list_prepend(FTList *list, void *data)
 {
-    FTList *node = malloc(sizeof(FTList));
-
-    memset(node, 0, sizeof(FTList));
+    FTList *node = calloc(1, sizeof(FTList));
 
     list = ft_list_first(list);
 

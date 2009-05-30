@@ -8,10 +8,8 @@ static void ft_button_event_handler(FTEvent *event, void *data);
 
 FTButton *ft_button_new(const char *text)
 {
-    FTButton *button = malloc(sizeof(FTButton));
+    FTButton *button = calloc(1, sizeof(FTButton));
     FTWidget *widget = (FTWidget *)button;
-
-    memset(button, 0, sizeof(FTButton));
 
     ft_widget_init_default(widget);
 

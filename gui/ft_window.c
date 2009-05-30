@@ -17,10 +17,8 @@ static void ft_window_destroy(FTWidget *widget);
 
 FTWindow *ft_window_new()
 {
-    FTWindow *window = malloc(sizeof(FTWindow));
+    FTWindow *window = calloc(1, sizeof(FTWindow));
     FTWidget *widget = (FTWidget *)window;
-
-    memset(window, 0, sizeof(FTWindow));
 
     ft_widget_init_default(widget);
 

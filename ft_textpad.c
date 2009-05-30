@@ -20,7 +20,7 @@ static char **ft_textpad_split(const char *text, int *len)
     char *p;
     int i;
 
-    lines = malloc((FT_MAX_LINE + 1) * sizeof(char *));
+    lines = calloc(FT_MAX_LINE + 1, sizeof(char *));
 
     p = strchr(text, '\n');
 

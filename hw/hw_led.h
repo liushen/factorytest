@@ -2,6 +2,9 @@
 #ifndef _HW_LED_H_
 #define _HW_LED_H_
 
+#define HL_DEV_LCD_BRIGHT   "/sys/class/backlight/broncho-backlight/brightness"
+#define HL_DEV_KP_BACKLIGHT "/sys/class/flashlight/broncho-kp_backligh/power"
+
 enum
 {
     HL_DEVICE_LCD = 0,

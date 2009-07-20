@@ -1,23 +1,11 @@
 #include <time.h>
+#include "ft_input.h"
 #include "ft_thread.h"
 
 #ifndef _FT_EVENTS_H_
 #define _FT_EVENTS_H_
 
 #define EVENTS_MAX      (16)
-
-#define FT_KEY_HOME     (102)
-#define FT_KEY_BACK     (158)
-#define FT_KEY_SEND     (231)
-#define FT_KEY_END      (107)
-#define FT_KEY_OK       (232)
-#define FT_KEY_MENU     (229)
-
-#define FT_KEY_VOL_ADD  (114)
-#define FT_KEY_VOL_SUB  (115)
-#define FT_KEY_POWER    (116)
-
-#define FT_KEY_MOUSE    (330)
 
 typedef int    FTEventId; 
 typedef int    FTEventKey; 

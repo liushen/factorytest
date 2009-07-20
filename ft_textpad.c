@@ -43,6 +43,7 @@ static char **ft_textpad_split(const char *text, int *len)
         lines[i] = malloc(p - text + 1);
 
         strncpy(lines[i], text, p - text);
+        lines[i][p - text] = '\0';
         text = p + 1;
 
         p = strchr(text, '\n');

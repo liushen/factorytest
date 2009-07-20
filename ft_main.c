@@ -8,6 +8,7 @@
 #include "ft_keyboard.h"
 #include "ft_textpad.h"
 #include "ft_matrix.h"
+#include "ft_adc.h"
 #include "ft_led.h"
 #include "ft_lcdcolor.h"
 #include "ft_lcdcontrast.h"
@@ -62,9 +63,7 @@ static void on_lcdcontrast_handler(FTButton *button, void *data)
 
 static void on_adc_handler(FTButton *button, void *data)
 {
-    const char *adc = hw_get_ADC();
-
-    FTWindow *window = ft_textpad_new(adc, 1);
+    FTWindow *window = ft_adc_new();
     ft_window_show(window);
 }
 
@@ -93,7 +92,7 @@ static void on_vibrator_handler(FTButton *button, void *data)
         ft_button_set_text(button, "Vibrator (ON)");
         ft_button_set_color(button, &ft_color_g);
 
-        hw_vibrator_set(1);
+        hw_vibrator_set(-1);
     }
     else
     {
@@ -111,7 +110,7 @@ static void on_loudspk_handler(FTButton *button, void *data)
         ft_button_set_text(button, "Loud SPK (ON)");
         ft_button_set_color(button, &ft_color_g);
 
-        hw_audio_play(HA_DEVICE_SPEAKER, "/system/data/factorytest/sound.wav");
+        hw_audio_play(HA_DEVICE_SPEAKER, "/system/usr/share/factorytest/sound.wav");
     }
     else
     {
@@ -129,7 +128,7 @@ static void on_ring_handler(FTButton *button, void *data)
         ft_button_set_text(button, "Ring (ON)");
         ft_button_set_color(button, &ft_color_g);
 
-        hw_audio_play(HA_DEVICE_SPEAKER, "/system/data/factorytest/ring.wav");
+        hw_audio_play(HA_DEVICE_SPEAKER, "/system/usr/share/factorytest/ring.wav");
     }
     else
     {
@@ -178,13 +177,14 @@ static void on_handset_handler(FTButton *button, void *data)
 
 static void on_camera_handler(FTButton *button, void *data)
 {
-    char text[TEXT_LEN_MAX];
-    int camera_nr = hw_get_camera_nr();
+    FTWindow *window;
 
-    snprintf(text, TEXT_LEN_MAX, "Found %d camera(s).", camera_nr);
+    int status = hw_detect_camera();
+    
+    window = ft_textpad_new(status ? "Camera hardware has been found." : 
+                                     "Camera hardware not found!", 1);
 
-    FTWindow *window = ft_textpad_new(text, 1);
-    ft_textpad_set_color(window, camera_nr ? &ft_color_g : &ft_color_r);
+    ft_textpad_set_color(window, status ? &ft_color_g : &ft_color_r);
     ft_window_show(window);
 }
 
@@ -267,11 +267,11 @@ int main(int argc, char *argv[])
     button = ft_button_new("Loud SPK");
     ft_button_set_handler(button, on_loudspk_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);
-
+/*
     button = ft_button_new("Ring");
     ft_button_set_handler(button, on_ring_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);
-
+*/
     button = ft_button_new("LED");
     ft_button_set_handler(button, on_led_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);
@@ -279,15 +279,15 @@ int main(int argc, char *argv[])
     button = ft_button_new("LCD");
     ft_button_set_handler(button, on_lcdcolor_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);
-    /*
+/*
     button = ft_button_new("Contrast");
     ft_button_set_handler(button, on_lcdcontrast_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);
-    */
+    
     button = ft_button_new("Receiver");
     ft_button_set_handler(button, on_receiver_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);
-
+*/
     button = ft_button_new("ADC");
     ft_button_set_handler(button, on_adc_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);
@@ -303,11 +303,11 @@ int main(int argc, char *argv[])
     button = ft_button_new("Camera");
     ft_button_set_handler(button, on_camera_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);
-
+/*
     button = ft_button_new("Bluetooth");
     ft_button_set_handler(button, on_bluetooth_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);
-
+*/
     button = ft_button_new("Wifi");
     ft_button_set_handler(button, on_wifi_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);

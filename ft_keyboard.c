@@ -6,13 +6,13 @@ typedef struct _FKContext FKContext;
 
 static const char *fk_all_labels[] = 
 {
-    "Home", "Back", "Send", "End", "OK", "Menu", 
+    "Back", "Send", "End", "OK", "Menu", 
     "Volume -", "Volume +", "Power"
 };
 
 static const int fk_all_keys[] = 
 {
-    FT_KEY_HOME, FT_KEY_BACK, FT_KEY_SEND, FT_KEY_END, FT_KEY_OK, FT_KEY_MENU,
+    FT_KEY_BACK, FT_KEY_SEND, FT_KEY_END, FT_KEY_OK, FT_KEY_MENU,
     FT_KEY_VOL_SUB, FT_KEY_VOL_ADD, FT_KEY_POWER
 };
 

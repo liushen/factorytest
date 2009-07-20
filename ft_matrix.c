@@ -4,7 +4,7 @@
 
 #define FM_DEFAULT_ROW      4
 #define FM_DEFAULT_COL      4
-#define FM_DEFAULT_SIZE     40
+#define FM_DEFAULT_SIZE     50
 
 static FTRect ft_matrix_get_rect(FTWidget *widget, int col, int row)
 {

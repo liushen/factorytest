@@ -17,11 +17,17 @@ LOCAL_SRC_FILES:= \
 		ft_textpad.c \
 		ft_keyboard.c \
 		ft_matrix.c \
+		ft_adc.c \
 		ft_led.c \
 		ft_lcdcolor.c \
 		ft_main.c
  
 LOCAL_MODULE := factory_test
+LOCAL_CFLAGS := -DSERIAL_NO="\"0.100\""
 
 include $(BUILD_EXECUTABLE)
 
+file := $(TARGET_OUT)/usr/share/factorytest/sound.wav
+ALL_PREBUILT += $(file)
+$(file) : $(LOCAL_PATH)/data/sound.wav | $(ACP)
+	$(transform-prebuilt-to-target)

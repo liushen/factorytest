@@ -58,10 +58,10 @@ void ft_window_layout(FTWindow *window)
         if (!w->rect.width || !w->rect.height)
         {
             w->rect.x = (i % 2) ? (s->width / 2 + FT_FONT_W) : FT_FONT_W;
-            w->rect.y = (i / 2) * (FT_FONT_H + FT_FONT_W * 3) + FT_FONT_W;
+            w->rect.y = (i / 2) * (FT_FONT_H + FT_FONT_W * 5) + FT_FONT_W;
 
             w->rect.width = s->width / 2 - FT_FONT_W * 2;
-            w->rect.height = FT_FONT_H + FT_FONT_W * 2;
+            w->rect.height = FT_FONT_H + FT_FONT_W * 4;
         }
     }
 }
@@ -167,11 +167,11 @@ void ft_window_move_focus(FTWindow *window, int orient)
 
 void ft_window_close(FTWindow *window)
 {
-    assert(window != NULL);
+    FTWidget *widget = (FTWidget *)window;
 
     FTList *last = ft_list_last(fw_context.windows);
 
-    ft_window_destroy((FTWidget *)window);
+    widget->destroy(widget);
 
     if (window == last->data)
     {

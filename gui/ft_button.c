@@ -51,6 +51,7 @@ static void ft_button_draw(FTWidget *widget)
 {
     FTButton *button = (FTButton *)widget;
     FTDrawGC gc = widget->gc;
+    FTRect *rect = &widget->rect;
     FTPoint point;
 
     if (!widget->visible)
@@ -58,8 +59,8 @@ static void ft_button_draw(FTWidget *widget)
 
     ft_widget_draw(widget);
 
-    point.x = widget->rect.x + FT_FONT_W;
-    point.y = widget->rect.y + FT_FONT_W;
+    point.x = rect->x + FT_FONT_W;
+    point.y = rect->y + (rect->height - FT_FONT_H) / 2;
 
     gc.foreground = button->color;
 

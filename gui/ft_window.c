@@ -13,7 +13,6 @@ struct _FWContext
 static FWContext fw_context;
 
 static void ft_window_event_handler(FTEvent *event, void *data);
-static void ft_window_destroy(FTWidget *widget);
 
 FTWindow *ft_window_new()
 {
@@ -57,11 +56,19 @@ void ft_window_layout(FTWindow *window)
 
         if (!w->rect.width || !w->rect.height)
         {
-            w->rect.x = (i % 2) ? (s->width / 2 + FT_FONT_W) : FT_FONT_W;
-            w->rect.y = (i / 2) * (FT_FONT_H + FT_FONT_W * 5) + FT_FONT_W;
+            w->rect.x = (i % 2) ? (s->width / 2 + FT_WIDGET_SPACING) : FT_WIDGET_SPACING;
+            w->rect.y = (i / 2) * (FT_WIDGET_HEIGHT + FT_WIDGET_SPACING) + FT_WIDGET_SPACING;
 
-            w->rect.width = s->width / 2 - FT_FONT_W * 2;
-            w->rect.height = FT_FONT_H + FT_FONT_W * 4;
+            w->rect.width = s->width / 2 - FT_WIDGET_SPACING * 2;
+            w->rect.height = FT_WIDGET_HEIGHT;
+
+            if (w->rect.y + w->rect.height > s->height)
+            {
+                memset(&w->rect, 0, sizeof(FTRect));
+                w->destroy(w);
+
+                ft_list_delete(iter, iter->data);
+            }
         }
     }
 }
@@ -102,6 +109,20 @@ int ft_window_add_child(FTWindow *window, FTWidget *widget)
     assert(widget != NULL);
 
     window->children = ft_list_append(window->children, widget);
+
+    ft_window_layout(window);
+
+    return FT_SUCCESS;
+}
+
+int ft_window_add(FTWindow *window, FTWidget *widget, int position)
+{
+    assert(widget != NULL);
+
+    if (position < 0)
+        return ft_window_add_child(window, widget);
+
+    window->children = ft_list_insert(window->children, widget, position);
 
     ft_window_layout(window);
 
@@ -184,7 +205,7 @@ void ft_window_close(FTWindow *window)
     fw_context.windows = ft_list_delete(fw_context.windows, window);
 }
 
-static void ft_window_destroy(FTWidget *widget)
+void ft_window_destroy(FTWidget *widget)
 {
     FTWindow *window = (FTWindow *)widget;
     FTList *iter = window->children;
@@ -232,26 +253,30 @@ static void ft_window_event_handler(FTEvent *event, void *data)
         case FE_KEY_RELEASE:
             ke = (FTKeyEvent *)event;
 
-            if (ke->key == FT_KEY_OK)
+            switch (ke->key)
             {
-                w = ft_window_get_focus(window);
+                case FT_KEY_OK:
+                    w = ft_window_get_focus(window);
 
-                if (w && w->handler)
-                {
-                    w->handler(event, w->data);
-                }
-            }
-            else if (ke->key == FT_KEY_SEND)
-            {
-                ft_window_move_focus(window, 1);
-            }
-            else if (ke->key == FT_KEY_END)
-            {
-                ft_window_move_focus(window, -1);
-            }
-            else if (ke->key == FT_KEY_BACK)
-            {
-                ft_window_close(window);
+                    if (w && w->handler)
+                    {
+                        w->handler(event, w->data);
+                    }
+                    break;
+
+                case FT_KEY_UP:
+                case FT_KEY_LEFT:
+                    ft_window_move_focus(window, -1);
+                    break;
+
+                case FT_KEY_DOWN:
+                case FT_KEY_RIGHT:
+                    ft_window_move_focus(window, 1);
+                    break;
+
+                case FT_KEY_BACK:
+                    ft_window_close(window);
+                    break;
             }
 
             break;

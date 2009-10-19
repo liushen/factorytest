@@ -64,6 +64,9 @@ FTList *ft_list_insert(FTList *list, void *data, int position)
         node->prev = list->prev;
         node->data = data;
 
+        if (list->prev)
+            list->prev->next = node;
+
         list->prev = node;
     }
 
@@ -120,6 +123,17 @@ FTList *ft_list_find(FTList *list, void *data)
     }
 
     return iter;
+}
+
+int ft_list_length(FTList *list)
+{
+    int len = 0;
+
+    list = ft_list_first(list);
+
+    for(; list; list = list->next) len++;
+
+    return len;
 }
 
 void *ft_list_nth_data(FTList *list, int nth)

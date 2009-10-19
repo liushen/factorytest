@@ -13,12 +13,10 @@
 
 static int *open_all_inputs(int *maxfd)
 {
-    static int fds[FT_INPUT_MAX+1];
+    static int fds[FT_INPUT_MAX+1] = {0};
 
-    char input[BUFFER_SIZE];
+    char input[BUFFER_SIZE] = {0};
     int fd, max = 0, i = 0;
-
-    memset(fds, 0, sizeof(fds));
 
     for (i = 0; i < FT_INPUT_MAX; i++)
     {
@@ -60,8 +58,8 @@ static void dispatch_event(struct input_event *e)
     FTKeyEvent ke;
     FTEvent *event;
 
-    //printf("EVENT: type=%d, code=%d, value=%d, x=%d, y=%d\n", 
-    //        e->type, e->code, e->value, x, y);
+    // printf("EVENT: type=%d, code=%d, value=%d, x=%d, y=%d\n", 
+    //         e->type, e->code, e->value, x, y);
 
     switch (e->type)
     {
@@ -90,6 +88,30 @@ static void dispatch_event(struct input_event *e)
             }
 
             break;
+
+        case EV_REL:
+            event = (FTEvent *)&ke;
+
+            if (e->code == REL_X)
+            {
+                if (e->value < 0)
+                    ke.key = FT_KEY_LEFT;
+                else
+                    ke.key = FT_KEY_RIGHT;
+            }
+            else /* REL_Y */
+            {
+                if (e->value < 0)
+                    ke.key = FT_KEY_UP;
+                else
+                    ke.key = FT_KEY_DOWN;
+            }
+
+            event->type = FE_KEY_PRESS;
+            ft_event_put(event);
+
+            event->type = FE_KEY_RELEASE;
+            ft_event_put(event);
 
         case EV_KEY:
             if (e->code == FT_KEY_MOUSE)

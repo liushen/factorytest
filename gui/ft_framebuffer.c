@@ -31,7 +31,7 @@ FBSurface *ft_frame_buffer_get_default()
 
     int fd = open(FRAMEBUFFER_DEV_NAME, O_RDWR);
 
-    if (!fd) 
+    if (fd < 0) 
     {
         perror("open "FRAMEBUFFER_DEV_NAME);
         return NULL;

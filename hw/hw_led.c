@@ -21,6 +21,14 @@ void hw_led_set(int device, int status)
             hw_file_write(HL_DEV_KP_BACKLIGHT, buf);
             break;
 
+        case HL_DEVICE_TRACKBALL:
+            hw_file_write(HL_DEV_BALL_BRIGHT, buf);
+            break;
+
+        case HL_DEVICE_FLASH_LIGHT:
+            hw_file_write(HL_DEV_FLASH_LIGHT, buf);
+            break;
+
         default:break;
     }
 }
@@ -29,25 +37,34 @@ int hw_led_get_range(int device, int *min, int *max)
 {
     char *text = NULL;
 
-    if (device == HL_DEVICE_LCD)
-        text = hw_file_read(HL_DEV_LCD_BRIGHT_MAX, 0);
-
-    if (device == HL_DEVICE_KEYBOARD)
-        text = hw_file_read(HL_DEV_KP_BACKLIGHT_MAX, 0);
-
-    if (text)
+    switch (device)
     {
-        if (max)
-            *max = atoi(text);
+        case HL_DEVICE_LCD:
+            text = hw_file_read(HL_DEV_LCD_BRIGHT_MAX, 0);
+            break;
 
-        if (min)
-            *min = 0;
+        case HL_DEVICE_KEYBOARD:
+            text = hw_file_read(HL_DEV_KP_BACKLIGHT_MAX, 0);
+            break;
 
-        free(text);
+        case HL_DEVICE_TRACKBALL:
+            text = hw_file_read(HL_DEV_BALL_BRIGHT_MAX, 0);
+            break;
 
-        return 1;
+        default: break;
     }
 
-    return 0;
+    if (text == NULL)
+        return 0;
+
+    if (max)
+        *max = atoi(text);
+
+    if (min)
+        *min = 0;
+
+    free(text);
+
+    return 1;
 }
 

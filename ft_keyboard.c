@@ -1,19 +1,22 @@
 #include "ft_keyboard.h"
-#include "ft_type.h"
+#include "ft_config.h"
 #include "gui/ft_button.h"
+#include <stdio.h>
 
 typedef struct _FKContext FKContext;
 
 static const char *fk_all_labels[] = 
 {
     "Back", "Send", "End", "OK", "Menu", 
-    "Volume -", "Volume +", "Power"
+    "Volume -", "Volume +", "Power",
+    "UP", "LEFT", "RIGHT", "DOWN"
 };
 
 static const int fk_all_keys[] = 
 {
     FT_KEY_BACK, FT_KEY_SEND, FT_KEY_END, FT_KEY_OK, FT_KEY_MENU,
-    FT_KEY_VOL_SUB, FT_KEY_VOL_ADD, FT_KEY_POWER
+    FT_KEY_VOL_SUB, FT_KEY_VOL_ADD, FT_KEY_POWER, 
+    FT_KEY_UP, FT_KEY_LEFT, FT_KEY_RIGHT, FT_KEY_DOWN
 };
 
 struct _FKContext
@@ -50,6 +53,8 @@ static void ft_keyboard_handler(FTEvent *event, void *data)
 
     if (id > -1)
     {
+        char key[32];
+
         ft_widget_set_visible(fk_context.buttons[id], 0);
 
         for (i = 0; i < FT_N_ELEMENTS(fk_context.buttons); i++)
@@ -58,6 +63,8 @@ static void ft_keyboard_handler(FTEvent *event, void *data)
                 return;
         }
 
+        sprintf(key, "%d", FT_ITEM_KEY);
+        ft_config_set_int(key, FT_STATUS_OK);
         ft_window_close(window);
     }
 }
@@ -67,6 +74,7 @@ FTWindow *ft_keyboard_new()
     FTWindow *window;
     FTWidget *widget;
     FTWidget **buttons;
+    char key[32];
     int i;
 
     window = ft_window_new();
@@ -79,6 +87,9 @@ FTWindow *ft_keyboard_new()
 
         ft_window_add_child(window, buttons[i]);
     }
+
+    sprintf(key, "%d", FT_ITEM_KEY);
+    ft_config_set_int(key, FT_STATUS_NORMAL);
 
     widget->handler = ft_keyboard_handler;
     widget->data = window;

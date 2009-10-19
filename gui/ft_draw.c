@@ -9,23 +9,8 @@
 #define MAX(x, y)   ((x)>(y))?(x):(y)
 #define MIN(x, y)   ((x)<(y))?(x):(y)
 
-int fb_make_color_15(int g, int b, int r)
-{
-    r >>= 3;
-    g >>= 3;
-    b >>= 3;
-
-    return (r << 10 | g << 5 | b);
-}
-
-int fb_make_color_16(int g, int b, int r)
-{
-    r >>= 3;
-    g >>= 2;
-    b >>= 3;
-
-    return (r << 11 | g << 5 | b);
-}
+#define FB_MAKE_COLOR_16(r, g, b) \
+    (((r) >> 3) << 11 | ((g) >> 2) << 5 | ((b) >> 3))
 
 int ft_draw_box(FBSurface *s, FTRect *rect, FTDrawGC *gc, int fill)
 {
@@ -109,10 +94,10 @@ int ft_draw_point(FBSurface *s, FTPoint *point, FTDrawGC *gc)
 
     p = (point->x + point->y * s->width) * s->depth;
 
-    c16 = fb_make_color_15(fg.r, fg.g, fg.b);
+    c16 = FB_MAKE_COLOR_16(fg.r, fg.g, fg.b);
 
-    s->buffer[p] = c16 >> 8;
-    s->buffer[p+1] = c16 & 0xFF;
+    s->buffer[p] = c16 & 0xFF;
+    s->buffer[p+1] = c16 >> 8;
 
     return FT_SUCCESS;
 }
@@ -192,6 +177,8 @@ void ft_draw_cleanup(FBSurface *s)
         .width = s->width,
         .height = s->height,
     };
+
+    memset(&gc, 0, sizeof(FTDrawGC));
 
     ft_draw_box(s, &rect, &gc, 1);
 }

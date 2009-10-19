@@ -1,4 +1,6 @@
 #include "hw_comm.h"
+#include "modemcontrol.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,13 +17,15 @@ const char *hw_get_version()
 
     char *hw_ver = hw_file_read("/proc/hw_version", 16);
 
-    snprintf(version, VER_LEN_MAX, "Version No: %s\nSerial No: %s", hw_ver, SERIAL_NO);
+    snprintf(version, VER_LEN_MAX, 
+            "Version No: %s\nSerial No: %s", hw_ver, SERIAL_NO);
+
     free(hw_ver);
 
     return version;
 }
 
-const char *hw_get_ADC()
+const char *hw_get_adc()
 {
     static char adc[ADC_LEN_MAX];
     char *vol = hw_file_read(HW_DEV_BATTERY_VOL, 16);
@@ -44,12 +48,6 @@ void hw_vibrator_set(int status)
     sprintf(buf, "%d", status);
 
     hw_file_write(HW_DEV_VIBRATOR, buf);
-}
-
-int hw_detect_bluetooth()
-{
-    //TODO
-    return 0;
 }
 
 int hw_detect_devices(const char *path)
@@ -76,14 +74,24 @@ int hw_detect_devices(const char *path)
     return count;
 }
 
+int hw_detect_ambient()
+{
+    return access(HW_DEV_AMBIENT, F_OK) == 0;
+}
+
+int hw_detect_proximity()
+{
+    return access(HW_DEV_PROXIMITY, F_OK) == 0;
+}
+
+int hw_detect_g_sensor()
+{
+    return hw_detect_devices(HW_DEV_GSENSOR);
+}
+
 int hw_detect_camera()
 {
     return hw_detect_devices(HW_DEV_CAMERA);
-}
-
-int hw_detect_fm()
-{
-    return hw_detect_devices(HW_DEV_FM);
 }
 
 int hw_detect_gps()
@@ -106,20 +114,9 @@ int hw_detect_wifi()
     return (p != NULL);
 }
 
-int hw_open_modem()
+int hw_detect_memory_card()
 {
-#if 0
-    int fd = open("/dev/modem", O_RDWR);
-
-    if (fd > 0)
-    {
-        ioctl(fd, MODEM_PWR_ON);
-        close(fd);
-
-        return 1;
-    }
-#endif
-    return 0;
+    return access(HW_DEV_MMC, F_OK) == 0;
 }
 
 int hw_file_write(const char *file, const char *content)
@@ -153,7 +150,12 @@ char *hw_file_read(const char *file, size_t len)
         return NULL;
     }
 
-    size = read(fd, buf, len ? len : BUF_LEN_MAX);
+    if (len == 0 || len > BUF_LEN_MAX)
+    {
+        len = BUF_LEN_MAX;
+    }
+
+    size = read(fd, buf, len);
     close(fd);
 
     if (size > 0)

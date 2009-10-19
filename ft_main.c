@@ -1,33 +1,75 @@
 #include "gui/ft_input.h"
 #include "gui/ft_window.h"
 #include "gui/ft_button.h"
+#include "gui/ft_status_button.h"
 #include "hw/hw_comm.h"
 #include "hw/hw_audio.h"
 #include "hw/hw_led.h"
+#include "hw/hw_camera.h"
+#include "hw/hw_bluetooth.h"
+#include "hw/hw_wifi.h"
+#include "hw/hw_gsm.h"
 
+#include "ft_config.h"
 #include "ft_keyboard.h"
 #include "ft_textpad.h"
 #include "ft_matrix.h"
 #include "ft_adc.h"
 #include "ft_led.h"
+#include "ft_gsm.h"
 #include "ft_lcdcolor.h"
 #include "ft_lcdcontrast.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#define TEXT_LEN_MAX    (32)
+#define BUF_LEN_MAX             32
+#define BLUETOOTH_TEST_NR       1
+
+#define TEXT_DEVICE_FOUND       "The device detected!"
+#define TEXT_DEVICE_NOT_FOUND   "The device is not detected!"
 
 FTColor ft_color_r = {0xff, 0, 0, 0};
 FTColor ft_color_g = {0, 0xff, 0, 0};
 FTColor ft_color_b = {0, 0, 0xff, 0};
 FTColor ft_color_w = {0xff, 0xff, 0xff, 0};
 
+typedef struct _FTestItem FTestItem;
+
+struct _FTestItem
+{
+    int         id;
+    const char *desc;
+    FBHandler   handler;
+};
+
+static void on_clear_test_handler(FTButton *button, void *data)
+{
+    ft_config_reset();
+    exit(0);
+}
+
+static void on_reboot_handler(FTButton *button, void *data)
+{
+    system("reboot");
+}
+
 static void on_version_handler(FTButton *button, void *data)
 {
     const char *ver = hw_get_version();
 
     FTWindow *window = ft_textpad_new(ver, 1);
+
+    button = ft_button_new("Clear Test");
+    ft_button_set_handler(button, on_clear_test_handler, data);
+    ft_window_add(window, (FTWidget *)button, 0);
+
+    button = ft_button_new("Reboot");
+    ft_button_set_handler(button, on_reboot_handler, data);
+    ft_window_add(window, (FTWidget *)button, 1);
+
+    ft_textpad_set_id(window, FT_ITEM_VER);
     ft_window_show(window);
 }
 
@@ -37,16 +79,58 @@ static void on_keyboard_handler(FTButton *button, void *data)
     ft_window_show(window);
 }
 
-static void on_matrix_handler(FTButton *button, void *data)
-{
-    FTWindow *window = ft_matrix_new();
-    ft_window_show(window);
-}
-
 static void on_led_handler(FTButton *button, void *data)
 {
     FTWindow *window = ft_led_new();
     ft_window_show(window);
+}
+
+static void on_vibrator_handler(FTButton *button, void *data)
+{
+    FTWindow *window;
+
+    window = ft_textpad_new("Vibrator", 1);
+    
+    ft_textpad_set_id(window, FT_ITEM_MOTOR);
+    ft_window_show(window);
+
+    hw_vibrator_set(-1);
+}
+
+static void on_loudspk_handler(FTButton *button, void *data)
+{
+    FTWindow *window;
+
+    window = ft_textpad_new("Loud SPK", 1);
+    
+    ft_textpad_set_id(window, FT_ITEM_SPK);
+    ft_window_show(window);
+
+    hw_audio_play(HA_DEVICE_SPEAKER, "/system/usr/share/factorytest/sound.wav");
+}
+
+static void on_echoloop_handler(FTButton *button, void *data)
+{
+    FTWindow *window;
+
+    window = ft_textpad_new("Echoloop", 1);
+    
+    hw_audio_echoloop_set(HA_DEVICE_SPEAKER, 1);
+
+    ft_textpad_set_id(window, FT_ITEM_LOOP);
+    ft_window_show(window);
+}
+
+static void on_handset_handler(FTButton *button, void *data)
+{
+    FTWindow *window;
+
+    window = ft_textpad_new("Handset", 1);
+    
+    ft_textpad_set_id(window, FT_ITEM_HANDSET);
+    ft_window_show(window);
+
+    hw_audio_echoloop_set(HA_DEVICE_HANDSET, 1);
 }
 
 static void on_lcdcolor_handler(FTButton *button, void *data)
@@ -55,176 +139,143 @@ static void on_lcdcolor_handler(FTButton *button, void *data)
     ft_window_show(window);
 }
 
-static void on_lcdcontrast_handler(FTButton *button, void *data)
+static void on_matrix_handler(FTButton *button, void *data)
 {
-    FTWindow *window = ft_lcdcontrast_new();
+    FTWindow *window = ft_matrix_new();
     ft_window_show(window);
 }
 
 static void on_adc_handler(FTButton *button, void *data)
 {
     FTWindow *window = ft_adc_new();
+
+    ft_textpad_set_id(window, FT_ITEM_ADC);
     ft_window_show(window);
 }
 
-static void on_echoloop_handler(FTButton *button, void *data)
+static void ft_camera_handler(FTEvent *event, void *data)
 {
-    if (strcmp(button->text, "Echoloop") == 0)
+    FTWindow *window = (FTWindow *)data;
+
+    if (event->type == FE_KEY_RELEASE ||
+        event->type == FE_MOUSE_RELEASE)
     {
-        ft_button_set_text(button, "Echoloop (ON)");
-        ft_button_set_color(button, &ft_color_g);
+        hw_camera_close();
+        ft_window_close(window);
 
-        hw_audio_echoloop_set(HA_DEVICE_RECEIVER, 1);
-    }
-    else
-    {
-        ft_button_set_text(button, "Echoloop");
-        ft_button_set_color(button, &ft_color_w);
-
-        hw_audio_echoloop_set(HA_DEVICE_RECEIVER, 0);
-    }
-}
-
-static void on_vibrator_handler(FTButton *button, void *data)
-{
-    if (strcmp(button->text, "Vibrator") == 0)
-    {
-        ft_button_set_text(button, "Vibrator (ON)");
-        ft_button_set_color(button, &ft_color_g);
-
-        hw_vibrator_set(-1);
-    }
-    else
-    {
-        ft_button_set_text(button, "Vibrator");
-        ft_button_set_color(button, &ft_color_w);
-
-        hw_vibrator_set(0);
-    }
-}
-
-static void on_loudspk_handler(FTButton *button, void *data)
-{
-    if (strcmp(button->text, "Loud SPK") == 0)
-    {
-        ft_button_set_text(button, "Loud SPK (ON)");
-        ft_button_set_color(button, &ft_color_g);
-
-        hw_audio_play(HA_DEVICE_SPEAKER, "/system/usr/share/factorytest/sound.wav");
-    }
-    else
-    {
-        ft_button_set_text(button, "Loud SPK");
-        ft_button_set_color(button, &ft_color_w);
-
-        hw_audio_stop(HA_DEVICE_SPEAKER);
-    }
-}
-
-static void on_ring_handler(FTButton *button, void *data)
-{
-    if (strcmp(button->text, "Ring") == 0)
-    {
-        ft_button_set_text(button, "Ring (ON)");
-        ft_button_set_color(button, &ft_color_g);
-
-        hw_audio_play(HA_DEVICE_SPEAKER, "/system/usr/share/factorytest/ring.wav");
-    }
-    else
-    {
-        ft_button_set_text(button, "Ring");
-        ft_button_set_color(button, &ft_color_w);
-
-        hw_audio_stop(HA_DEVICE_SPEAKER);
-    }
-}
-
-static void on_receiver_handler(FTButton *button, void *data)
-{
-    if (strcmp(button->text, "Receiver") == 0)
-    {
-        ft_button_set_text(button, "Receiver (ON)");
-        ft_button_set_color(button, &ft_color_g);
-
-        hw_audio_play(HA_DEVICE_RECEIVER, "/system/data/factorytest/sound.wav");
-    }
-    else
-    {
-        ft_button_set_text(button, "Receiver");
-        ft_button_set_color(button, &ft_color_w);
-
-        hw_audio_stop(HA_DEVICE_RECEIVER);
-    }
-}
-
-static void on_handset_handler(FTButton *button, void *data)
-{
-    if (strcmp(button->text, "Handset") == 0)
-    {
-        ft_button_set_text(button, "Handset (ON)");
-        ft_button_set_color(button, &ft_color_g);
-
-        hw_audio_echoloop_set(HA_DEVICE_HANDSET, 1);
-    }
-    else
-    {
-        ft_button_set_text(button, "Handset");
-        ft_button_set_color(button, &ft_color_w);
-
-        hw_audio_echoloop_set(HA_DEVICE_HANDSET, 0);
+        window = ft_textpad_new("Camera", 1);
+        ft_textpad_set_id(window, FT_ITEM_CAMERA);
+        ft_window_show(window);
     }
 }
 
 static void on_camera_handler(FTButton *button, void *data)
 {
     FTWindow *window;
+    FTWidget *widget;
 
-    int status = hw_detect_camera();
-    
-    window = ft_textpad_new(status ? "Camera hardware has been found." : 
-                                     "Camera hardware not found!", 1);
+    window = ft_window_new();
+    widget = (FTWidget *)window;
 
-    ft_textpad_set_color(window, status ? &ft_color_g : &ft_color_r);
+    widget->handler = ft_camera_handler;
+    widget->data = window;
+
     ft_window_show(window);
+    hw_camera_open();
+}
+
+static void on_gsm_handler(FTButton *button, void *data)
+{
+    FTWindow *window;
+
+    window = ft_gsm_new();
+
+    ft_textpad_set_id(window, FT_ITEM_GSM);
+    ft_window_show(window);
+
 }
 
 static void on_bluetooth_handler(FTButton *button, void *data)
 {
-    FTWindow *window;
+    FTWindow *window = NULL;
+    char *devices = NULL;
+    int i = 0;
 
-    int status = hw_detect_bluetooth();
-    
-    window = ft_textpad_new(status ? "Bluetooth hardware has been found." : 
-                                     "Bluetooth hardware not found!", 1);
+    window = ft_textpad_new("", 1);
 
-    ft_textpad_set_color(window, status ? &ft_color_g : &ft_color_r);
+    ft_textpad_set_id(window, FT_ITEM_BT);
     ft_window_show(window);
+
+    for (i = 0; i < BLUETOOTH_TEST_NR; i++) 
+    {
+        ft_textpad_set_text(window, "Activating Bluetooth...");
+
+        if (!hw_bluetooth_enable())
+        {
+            ft_textpad_set_text(window, "Unenable Bluetooth!");
+            ft_textpad_set_color(window, &ft_color_r);
+
+            return;
+        }
+
+#if 1 /* scan bt devices */
+        ft_textpad_set_text(window, "Scanning ...");
+
+        devices = hw_bluetooth_scan();
+        ft_textpad_set_text(window, devices);
+        free(devices);
+
+        return;
+#endif
+        ft_textpad_set_text(window, "Bluethooth acvivated.");
+
+        if (!hw_bluetooth_disable())
+        {
+            ft_textpad_set_text(window, "Unenable Bluetooth!");
+            ft_textpad_set_color(window, &ft_color_r);
+
+            return;
+        }
+
+        ft_textpad_set_text(window, "Bluethooth deactivated.");
+    }
 }
 
 static void on_wifi_handler(FTButton *button, void *data)
 {
     FTWindow *window;
 
-    int status = hw_detect_wifi();
-    
-    window = ft_textpad_new(status ? "WIFI hardware has been found." : 
-                                     "WIFI hardware not found!", 1);
-    
-    ft_textpad_set_color(window, status ? &ft_color_g : &ft_color_r);
+    window = ft_textpad_new("Scanning ...", 1);
+
+    ft_textpad_set_id(window, FT_ITEM_WIFI);
     ft_window_show(window);
+
+    if (hw_wifi_open())
+    {
+        char *devices = NULL;
+
+        devices = hw_wifi_scan();
+        ft_textpad_set_text(window, devices);
+        free(devices);
+    }
+    else
+    {
+        ft_textpad_set_text(window, TEXT_DEVICE_NOT_FOUND);
+        ft_textpad_set_color(window, &ft_color_r);
+    }
 }
 
 static void on_fm_handler(FTButton *button, void *data)
 {
     FTWindow *window;
 
-    int status = hw_detect_fm();
-    
-    window = ft_textpad_new(status ? "FM hardware has been found." : 
-                                     "FM hardware not found!", 1);
+    window = ft_textpad_new("87.5", 1);
 
-    ft_textpad_set_color(window, status ? &ft_color_g : &ft_color_r);
+    ft_textpad_set_id(window, FT_ITEM_FM);
     ft_window_show(window);
+
+    hw_fm_start();
+    hw_fm_set_freq(87500);
 }
 
 static void on_gps_handler(FTButton *button, void *data)
@@ -232,100 +283,215 @@ static void on_gps_handler(FTButton *button, void *data)
     FTWindow *window;
 
     int status = hw_detect_gps();
-    
-    window = ft_textpad_new(status ? "GPS hardware has been found." : 
-                                     "GPS hardware not found!", 1);
+#if 0 
+    window = ft_textpad_new(status ? TEXT_DEVICE_FOUND : TEXT_DEVICE_NOT_FOUND, 1);
 
     ft_textpad_set_color(window, status ? &ft_color_g : &ft_color_r);
+    ft_textpad_set_id(window, FT_ITEM_GPS);
+
     ft_window_show(window);
+#else
+    char key[32];
+
+    sprintf(key, "%d", FT_ITEM_GPS);
+    ft_config_set_int(key, (status > 0) ? FT_STATUS_OK : FT_STATUS_FAIL);
+#endif
+}
+
+static void on_memory_card_handler(FTButton *button, void *data)
+{
+    FTWindow *window;
+
+    int status = hw_detect_memory_card();
+#if 0 
+    window = ft_textpad_new(status ? TEXT_DEVICE_FOUND : TEXT_DEVICE_NOT_FOUND, 1);
+
+    ft_textpad_set_color(window, status ? &ft_color_g : &ft_color_r);
+    ft_textpad_set_id(window, FT_ITEM_SD);
+
+    ft_window_show(window);
+#else
+    char key[32];
+
+    sprintf(key, "%d", FT_ITEM_SD);
+    ft_config_set_int(key, (status > 0) ? FT_STATUS_OK : FT_STATUS_FAIL);
+#endif
+}
+
+static void on_g_sensor_handler(FTButton *button, void *data)
+{
+    FTWindow *window;
+
+    int status = hw_detect_g_sensor();
+#if 0 
+    window = ft_textpad_new(status ? TEXT_DEVICE_FOUND : TEXT_DEVICE_NOT_FOUND, 1);
+
+    ft_textpad_set_color(window, status ? &ft_color_g : &ft_color_r);
+    ft_textpad_set_id(window, FT_ITEM_G_SENS);
+
+    ft_window_show(window);
+#else
+    char key[32];
+
+    sprintf(key, "%d", FT_ITEM_G_SENS);
+    ft_config_set_int(key, (status > 0) ? FT_STATUS_OK : FT_STATUS_FAIL);
+#endif
+}
+
+static void on_infrared_sensor_handler(FTButton *button, void *data)
+{
+    FTWindow *window;
+
+    int status = hw_detect_proximity();
+#if 0 
+    window = ft_textpad_new(status ? TEXT_DEVICE_FOUND : TEXT_DEVICE_NOT_FOUND, 1);
+
+    ft_textpad_set_color(window, status ? &ft_color_g : &ft_color_r);
+    ft_textpad_set_id(window, FT_ITEM_INFRA_SENS);
+
+    ft_window_show(window);
+#else
+    char key[32];
+
+    sprintf(key, "%d", FT_ITEM_INFRA_SENS);
+    ft_config_set_int(key, (status > 0) ? FT_STATUS_OK : FT_STATUS_FAIL);
+#endif
+}
+
+static void on_optical_sensor_handler(FTButton *button, void *data)
+{
+    FTWindow *window;
+
+    int status = hw_detect_ambient();
+#if 0    
+    window = ft_textpad_new(status ? TEXT_DEVICE_FOUND : TEXT_DEVICE_NOT_FOUND, 1);
+
+    ft_textpad_set_color(window, status ? &ft_color_g : &ft_color_r);
+    ft_textpad_set_id(window, FT_ITEM_OPTI_SEND);
+
+    ft_window_show(window);
+#else
+    char key[32];
+
+    sprintf(key, "%d", FT_ITEM_OPTI_SENS);
+    ft_config_set_int(key, (status > 0) ? FT_STATUS_OK : FT_STATUS_FAIL);
+#endif
+}
+
+const FTestItem ft_test_items[] = 
+{
+    {FT_ITEM_VER, "Version", on_version_handler},
+    {FT_ITEM_KEY, "Key", on_keyboard_handler},
+    {FT_ITEM_LED, "LED", on_led_handler},
+    {FT_ITEM_MOTOR, "Vibrator", on_vibrator_handler},
+    {FT_ITEM_SPK, "Loud SPK", on_loudspk_handler},
+    {FT_ITEM_LOOP, "Echoloop", on_echoloop_handler},
+    {FT_ITEM_HANDSET, "Handset", on_handset_handler},
+    {FT_ITEM_LCD, "LCD", on_lcdcolor_handler},
+    {FT_ITEM_MATRIX, "M * M", on_matrix_handler},
+    {FT_ITEM_ADC, "ADC", on_adc_handler},
+    {FT_ITEM_CAMERA, "Camera", on_camera_handler},
+    {FT_ITEM_GSM, "GSM", on_gsm_handler},
+    {FT_ITEM_BT, "Bluetooth", on_bluetooth_handler},
+    {FT_ITEM_WIFI, "Wifi", on_wifi_handler},
+    {FT_ITEM_FM, "FM", on_fm_handler},
+    {FT_ITEM_GPS, "GPS", on_gps_handler},
+    {FT_ITEM_SD, "SD Card", on_memory_card_handler},
+    {FT_ITEM_G_SENS, "G-sensor", on_g_sensor_handler},
+    {FT_ITEM_INFRA_SENS, "Infra-sens", on_infrared_sensor_handler},
+    {FT_ITEM_OPTI_SENS, "Opti-sens", on_optical_sensor_handler},
+};
+
+static void on_config_changed(const char *key, const char *value, void *data)
+{
+    FTButton **buttons = (FTButton **)data;
+    int id = atoi(key);
+    int i = 0;
+
+    switch (id) /* close device */
+    {
+        case FT_ITEM_MOTOR:
+            hw_vibrator_set(0);
+            break;
+
+        case FT_ITEM_SPK:
+            hw_audio_stop(HA_DEVICE_SPEAKER);
+            break;
+
+        case FT_ITEM_LOOP:
+            hw_audio_echoloop_set(HA_DEVICE_SPEAKER, 0);
+            break;
+
+        case FT_ITEM_HANDSET:
+            hw_audio_echoloop_set(HA_DEVICE_HANDSET, 0);
+            break;
+
+        case FT_ITEM_WIFI:
+            hw_wifi_close();
+            break;
+
+        case FT_ITEM_FM:
+            hw_fm_stop();
+            break;
+    }
+
+    for (; i < FT_N_ELEMENTS(ft_test_items); i++)
+    {
+        if (id == ft_test_items[i].id)
+        {
+            ft_status_button_set_status((FTStatusButton *)buttons[i], atoi(value));
+            break;
+        }
+    }
 }
 
 int main(int argc, char *argv[])
 {
+    static FTButton *buttons[32];
+    char text[BUF_LEN_MAX];
+    int i = 0;
+
     FTWindow *window;
     FTButton *button;
 
     window = ft_window_new();
 
-    button = ft_button_new("Version");
-    ft_button_set_handler(button, on_version_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-    ft_widget_set_focus((FTWidget *)button);
+    for (i = 0; i < FT_N_ELEMENTS(ft_test_items); i++)
+    {
+        char key[BUF_LEN_MAX];
+        int value = 0;
 
-    button = ft_button_new("Echoloop");
-    ft_button_set_handler(button, on_echoloop_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
+        snprintf(text, BUF_LEN_MAX, 
+                "%02d.%s", i+1, ft_test_items[i].desc);
+        sprintf(key, "%d", ft_test_items[i].id);
 
-    button = ft_button_new("Key");
-    ft_button_set_handler(button, on_keyboard_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
+        buttons[i] = (FTButton *)ft_status_button_new(text);
+        ft_button_set_handler(buttons[i], ft_test_items[i].handler, window);
+        ft_window_add_child(window, (FTWidget *)buttons[i]);
 
-    button = ft_button_new("Vibrator");
-    ft_button_set_handler(button, on_vibrator_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
+        if ((value = ft_config_get_int(key)) != -1)
+        {
+            ft_status_button_set_status((FTStatusButton *)buttons[i], value);
+        }
+    }
 
-    button = ft_button_new("Loud SPK");
-    ft_button_set_handler(button, on_loudspk_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-/*
-    button = ft_button_new("Ring");
-    ft_button_set_handler(button, on_ring_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-*/
-    button = ft_button_new("LED");
-    ft_button_set_handler(button, on_led_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-
-    button = ft_button_new("LCD");
-    ft_button_set_handler(button, on_lcdcolor_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-/*
-    button = ft_button_new("Contrast");
-    ft_button_set_handler(button, on_lcdcontrast_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-    
-    button = ft_button_new("Receiver");
-    ft_button_set_handler(button, on_receiver_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-*/
-    button = ft_button_new("ADC");
-    ft_button_set_handler(button, on_adc_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-
-    button = ft_button_new("Handset");
-    ft_button_set_handler(button, on_handset_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-
-    button = ft_button_new("M * M");
-    ft_button_set_handler(button, on_matrix_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-
-    button = ft_button_new("Camera");
-    ft_button_set_handler(button, on_camera_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-/*
-    button = ft_button_new("Bluetooth");
-    ft_button_set_handler(button, on_bluetooth_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-*/
-    button = ft_button_new("Wifi");
-    ft_button_set_handler(button, on_wifi_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-
-    button = ft_button_new("FM");
-    ft_button_set_handler(button, on_fm_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-
-    button = ft_button_new("GPS");
-    ft_button_set_handler(button, on_gps_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-
+    ft_config_set_handler(on_config_changed, buttons);
+    ft_widget_set_focus((FTWidget *)buttons[0]);
     ft_window_show(window);
 
+    if (fork() == 0)
+    {
+        /* power on modem... */
+        execlp(AT_CMD_EXEC, AT_CMD_EXEC, "1", NULL);
+        exit(0);
+    }
+
+    /* event loop */
     wait_for_events();
 
+    /* unmap, close fb device */
     ft_frame_buffer_close();
 
-    return FT_SUCCESS;
+    return 0;
 }
 

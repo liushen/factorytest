@@ -27,6 +27,8 @@ FTList *ft_list_nth(FTList *list, int nth);
 
 FTList *ft_list_find(FTList *list, void *data);
 
+int ft_list_length(FTList *list);
+
 void *ft_list_nth_data(FTList *list, int nth);
 
 void  ft_list_free(FTList *list, int free_nodes);

@@ -1,10 +1,12 @@
 
 #include "ft_matrix.h"
+#include "ft_config.h"
+#include <stdio.h>
 #include <string.h>
 
 #define FM_DEFAULT_ROW      4
-#define FM_DEFAULT_COL      4
-#define FM_DEFAULT_SIZE     50
+#define FM_DEFAULT_COL      3
+#define FM_DEFAULT_SIZE     60
 
 static FTRect ft_matrix_get_rect(FTWidget *widget, int col, int row)
 {
@@ -52,9 +54,12 @@ static void ft_matrix_handler(FTEvent *event, void *data)
 
     FTMouseEvent *me;
     FTKeyEvent *ke;
+    char key[32];
     int i, j;
 
     static int num = FM_DEFAULT_COL * FM_DEFAULT_ROW;
+
+    sprintf(key, "%d", FT_ITEM_MATRIX);
 
     if (event->type == FE_KEY_RELEASE)
     {
@@ -62,6 +67,7 @@ static void ft_matrix_handler(FTEvent *event, void *data)
 
         if (ke->key == FT_KEY_BACK)
         {
+            ft_config_set_int(key, FT_STATUS_FAIL);
             ft_window_close(window);
         }
 
@@ -92,6 +98,7 @@ static void ft_matrix_handler(FTEvent *event, void *data)
                     {
                         num = FM_DEFAULT_COL * FM_DEFAULT_ROW;
 
+                        ft_config_set_int(key, FT_STATUS_OK);
                         ft_window_close(window);
                     }
 

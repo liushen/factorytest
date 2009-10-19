@@ -6,12 +6,16 @@
 #define HL_DEV_LCD_BRIGHT_MAX   "/sys/class/backlight/micco-bl/max_brightness"
 #define HL_DEV_KP_BACKLIGHT     "/sys/class/backlight/micco-kp-bl/brightness"
 #define HL_DEV_KP_BACKLIGHT_MAX "/sys/class/backlight/micco-kp-bl/max_brightness"
+#define HL_DEV_BALL_BRIGHT      "/sys/class/backlight/pxa3xx_pwm_bl2/brightness"
+#define HL_DEV_BALL_BRIGHT_MAX  "/sys/class/backlight/pxa3xx_pwm_bl2/max_brightness"
+#define HL_DEV_FLASH_LIGHT      "/sys/class/timed_output/flashlight/enable"
 
 enum
 {
     HL_DEVICE_LCD = 0,
     HL_DEVICE_KEYBOARD,
-    HL_DEVICE_TRACKBALL
+    HL_DEVICE_TRACKBALL,
+    HL_DEVICE_FLASH_LIGHT
 };
 
 enum

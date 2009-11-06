@@ -17,12 +17,15 @@
 #define HW_DEV_BATTERY_CUR  "/sys/class/power_supply/battery/current_avg"
 
 #define HW_WIFI_MODULE      "sd8xxx"
+#define HW_WIFI_SERVICE     "gh3801_init"
 
 const char *hw_get_version();
 
 const char *hw_get_adc();
 
 void hw_vibrator_set(int status);
+
+int hw_wireless_ready();
 
 int hw_detect_devices(const char *path);
 

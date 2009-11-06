@@ -1,5 +1,6 @@
 #include "hw_comm.h"
 #include "modemcontrol.h"
+#include <cutils/properties.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,18 +8,25 @@
 #include <dirent.h>
 #include <fcntl.h>
 
-#define VER_LEN_MAX     (255)
-#define ADC_LEN_MAX     (255)
-#define BUF_LEN_MAX     (128)
+#define VER_LEN_MAX 255
+#define ADC_LEN_MAX 255
+#define BUF_LEN_MAX 128
 
 const char *hw_get_version()
 {
-    static char version[VER_LEN_MAX];
+    static char version[VER_LEN_MAX] = {0};
+    char build[PROPERTY_VALUE_MAX] = {0};
 
     char *hw_ver = hw_file_read("/proc/hw_version", 16);
+    char *p = NULL;
+
+    property_get("ro.build.description", build, NULL);
+
+    if ((p = strchr(build, ' ')))
+        *p = '\0';
 
     snprintf(version, VER_LEN_MAX, 
-            "Version No: %s\nSerial No: %s", hw_ver, SERIAL_NO);
+            "Version No: %s\nSerial No: %s", hw_ver, build);
 
     free(hw_ver);
 
@@ -48,6 +56,15 @@ void hw_vibrator_set(int status)
     sprintf(buf, "%d", status);
 
     hw_file_write(HW_DEV_VIBRATOR, buf);
+}
+
+int hw_wireless_ready()
+{
+    char state[PROPERTY_VALUE_MAX] = {0};
+
+    property_get("init.svc."HW_WIFI_SERVICE, state, NULL);
+
+    return strcmp(state, "running") != 0;
 }
 
 int hw_detect_devices(const char *path)

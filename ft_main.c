@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/reboot.h>
 
 #define BUF_LEN_MAX             32
 #define BLUETOOTH_TEST_NR       1
@@ -50,9 +51,12 @@ static void on_clear_test_handler(FTButton *button, void *data)
     exit(0);
 }
 
-static void on_reboot_handler(FTButton *button, void *data)
+static void on_shutdown_handler(FTButton *button, void *data)
 {
-    system("reboot");
+#ifdef HAVE_ANDROID_OS
+    sync();
+    reboot(RB_POWER_OFF);
+#endif
 }
 
 static void on_version_handler(FTButton *button, void *data)
@@ -65,8 +69,8 @@ static void on_version_handler(FTButton *button, void *data)
     ft_button_set_handler(button, on_clear_test_handler, data);
     ft_window_add(window, (FTWidget *)button, 0);
 
-    button = ft_button_new("Reboot");
-    ft_button_set_handler(button, on_reboot_handler, data);
+    button = ft_button_new("Shutdown");
+    ft_button_set_handler(button, on_shutdown_handler, data);
     ft_window_add(window, (FTWidget *)button, 1);
 
     ft_textpad_set_id(window, FT_ITEM_VER);
@@ -208,6 +212,10 @@ static void on_bluetooth_handler(FTButton *button, void *data)
 
     for (i = 0; i < BLUETOOTH_TEST_NR; i++) 
     {
+        ft_textpad_set_text(window, "Loading ...");
+
+        while (!hw_wireless_ready()) sleep(1);
+
         ft_textpad_set_text(window, "Activating Bluetooth...");
 
         if (!hw_bluetooth_enable())
@@ -245,10 +253,14 @@ static void on_wifi_handler(FTButton *button, void *data)
 {
     FTWindow *window;
 
-    window = ft_textpad_new("Scanning ...", 1);
+    window = ft_textpad_new("Loading ...", 1);
 
     ft_textpad_set_id(window, FT_ITEM_WIFI);
     ft_window_show(window);
+
+    while (!hw_wireless_ready()) sleep(1);
+
+    ft_textpad_set_text(window, "Scanning ...");
 
     if (hw_wifi_open())
     {

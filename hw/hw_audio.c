@@ -59,20 +59,26 @@ void hw_audio_set_route(int route)
     switch(route)
     {
         case HA_ROUTE_HS:
+            system("alsa_amixer cset name='STEREO_CH1 Mixer DAC3 Switch' 1");
+            system("alsa_amixer cset name='STEREO_CH2 Mixer DAC3 Switch' 1");
+            system("alsa_amixer cset name='Stereo Ch1 Volume' 63");
+            system("alsa_amixer cset name='Stereo Ch2 Volume' 63");
+            break;
+
         case HA_ROUTE_ECHOLOOP_HS:
             system("alsa_amixer cset name='STEREO_CH1 Mixer DAC3 Switch' 1");
             system("alsa_amixer cset name='STEREO_CH2 Mixer DAC3 Switch' 1");
             system("alsa_amixer cset name='MIC Mux' 2");
-
-            system("alsa_amixer cset name='Stereo Ch1 Volume' 50");
-            system("alsa_amixer cset name='Stereo Ch2 Volume' 50");
             break;
 
         case HA_ROUTE_SPK:
-        case HA_ROUTE_ECHOLOOP_SPK:
             system("alsa_amixer cset name='MONO Mixer DAC3 Switch' 1");
+            system("alsa_amixer cset name='Mono Volume' 63");
+            break;
+
+        case HA_ROUTE_ECHOLOOP_SPK:
+            system("alsa_amixer cset name='BEAR Mixer DAC3 Switch' 1");
             system("alsa_amixer cset name='MIC Mux' 1");
-            system("alsa_amixer cset name='Mono Volume' 50");
             break;
 
         case HA_ROUTE_CALL_HS:

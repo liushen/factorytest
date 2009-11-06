@@ -95,6 +95,24 @@ static void on_trackball_handler(FTButton *button, void *data)
     }
 }
 
+static void on_charge_handler(FTButton *button, void *data)
+{
+    if (strcmp(button->text, "Charge") == 0)
+    {
+        ft_button_set_text(button, "Charge ");
+        ft_button_set_color(button, &ft_color_g);
+
+        hw_led_set(HL_DEVICE_CHARGE, 255);
+    }
+    else
+    {
+        ft_button_set_text(button, "Charge");
+        ft_button_set_color(button, &ft_color_w);
+
+        hw_led_set(HL_DEVICE_CHARGE, 0);
+    }
+}
+
 static void on_status_led_r_handler(FTButton *button, void *data)
 {
 }
@@ -109,13 +127,14 @@ static void on_status_led_b_handler(FTButton *button, void *data)
 
 static void on_lcm_bl_handler(FTButton *button, void *data)
 {
-    int max = 0, step, i;
+    int max = 0, value, step, i;
 
     if (!hw_led_get_range(HL_DEVICE_LCD, NULL, &max))
     {
         return;
     }
 
+    value = hw_led_get(HL_DEVICE_LCD);
     step = max / 8;
 
     for (i = 0; i < max; i += step)
@@ -124,6 +143,8 @@ static void on_lcm_bl_handler(FTButton *button, void *data)
 
         usleep(200 * 1000);
     }
+
+    hw_led_set(HL_DEVICE_LCD, value);
 }
 
 static void ft_lcm_window_draw(FTWidget *widget)
@@ -189,6 +210,10 @@ FTWindow *ft_led_new()
 
     button = ft_button_new("Trackball");
     ft_button_set_handler(button, on_trackball_handler, NULL);
+    ft_window_add_child(window, (FTWidget *)button);
+
+    button = ft_button_new("Charge");
+    ft_button_set_handler(button, on_charge_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);
 
 /*

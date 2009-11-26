@@ -29,14 +29,20 @@ LOCAL_SRC_FILES:= \
 		ft_led.c \
 		ft_lcdcolor.c \
 		ft_gsm.c \
+		ft_headset.c \
 		ft_config.c \
 		ft_main.c
  
 LOCAL_MODULE := factory_test
-LOCAL_CFLAGS := -DSERIAL_NO="\"0.100\""
+LOCAL_CFLAGS := \
+	-fPIC -D_POSIX_SOURCE \
+	-DALSA_CONFIG_DIR=\"/system/usr/share/alsa\" \
+	-DALSA_PLUGIN_DIR=\"/system/usr/lib/alsa-lib\" \
+	-DALSA_DEVICE_DIRECTORY=\"/dev/snd/\"
 
 LOCAL_C_INCLUDES += $(call include-path-for, bluedroid)
-LOCAL_SHARED_LIBRARIES += libbluedroid
+LOCAL_C_INCLUDES += external/alsa-lib/include
+LOCAL_SHARED_LIBRARIES += libaudio libbluedroid
 
 include $(BUILD_EXECUTABLE)
 

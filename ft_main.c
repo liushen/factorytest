@@ -19,6 +19,7 @@
 #include "ft_gsm.h"
 #include "ft_lcdcolor.h"
 #include "ft_lcdcontrast.h"
+#include "ft_headset.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -125,16 +126,16 @@ static void on_echoloop_handler(FTButton *button, void *data)
     ft_window_show(window);
 }
 
-static void on_handset_handler(FTButton *button, void *data)
+static void on_headset_handler(FTButton *button, void *data)
 {
     FTWindow *window;
 
-    window = ft_textpad_new("Handset", 1);
+    window = ft_headset_new();
     
-    ft_textpad_set_id(window, FT_ITEM_HANDSET);
+    ft_textpad_set_id(window, FT_ITEM_HEADSET);
     ft_window_show(window);
 
-    hw_audio_echoloop_set(HA_DEVICE_HANDSET, 1);
+    hw_audio_echoloop_set(HA_DEVICE_HEADSET, 1);
 }
 
 static void on_lcdcolor_handler(FTButton *button, void *data)
@@ -196,7 +197,6 @@ static void on_gsm_handler(FTButton *button, void *data)
 
     ft_textpad_set_id(window, FT_ITEM_GSM);
     ft_window_show(window);
-
 }
 
 static void on_bluetooth_handler(FTButton *button, void *data)
@@ -398,7 +398,7 @@ const FTestItem ft_test_items[] =
     {FT_ITEM_MOTOR, "Vibrator", on_vibrator_handler},
     {FT_ITEM_SPK, "Loud SPK", on_loudspk_handler},
     {FT_ITEM_LOOP, "Echoloop", on_echoloop_handler},
-    {FT_ITEM_HANDSET, "Handset", on_handset_handler},
+    {FT_ITEM_HEADSET, "Headset", on_headset_handler},
     {FT_ITEM_LCD, "LCD", on_lcdcolor_handler},
     {FT_ITEM_MATRIX, "M * M", on_matrix_handler},
     {FT_ITEM_ADC, "ADC", on_adc_handler},
@@ -434,8 +434,8 @@ static void on_config_changed(const char *key, const char *value, void *data)
             hw_audio_echoloop_set(HA_DEVICE_SPEAKER, 0);
             break;
 
-        case FT_ITEM_HANDSET:
-            hw_audio_echoloop_set(HA_DEVICE_HANDSET, 0);
+        case FT_ITEM_HEADSET:
+            hw_audio_echoloop_set(HA_DEVICE_HEADSET, 0);
             break;
 
         case FT_ITEM_WIFI:

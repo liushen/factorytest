@@ -56,35 +56,14 @@ static void on_keyboard_led_handler(FTButton *button, void *data)
     }
 }
 
-static void on_flash_light_handler(FTButton *button, void *data)
-{
-    if (strcmp(button->text, "Flashlight") == 0)
-    {
-        ft_button_set_text(button, "Flashlight ");
-        ft_button_set_color(button, &ft_color_g);
-
-        hw_led_set(HL_DEVICE_FLASH_LIGHT, -1);
-    }
-    else
-    {
-        ft_button_set_text(button, "Flashlight");
-        ft_button_set_color(button, &ft_color_w);
-
-        hw_led_set(HL_DEVICE_FLASH_LIGHT, 0);
-    }
-}
-
 static void on_trackball_handler(FTButton *button, void *data)
 {
     if (strcmp(button->text, "Trackball") == 0)
     {
-        int max = 0;
-
         ft_button_set_text(button, "Trackball ");
         ft_button_set_color(button, &ft_color_g);
 
-        hw_led_get_range(HL_DEVICE_TRACKBALL, NULL, &max);
-        hw_led_set(HL_DEVICE_TRACKBALL, max);
+        hw_led_set(HL_DEVICE_TRACKBALL, HL_DEV_LED_FULL);
     }
     else
     {
@@ -95,34 +74,35 @@ static void on_trackball_handler(FTButton *button, void *data)
     }
 }
 
-static void on_charge_handler(FTButton *button, void *data)
+static void on_flash_light_handler(FTButton *button, void *data)
 {
-    if (strcmp(button->text, "Charge") == 0)
-    {
-        ft_button_set_text(button, "Charge ");
-        ft_button_set_color(button, &ft_color_g);
+    hw_led_set(HL_DEVICE_FLASH_LIGHT, -1);
+    ft_button_set_color(button, &ft_color_g);
 
-        hw_led_set(HL_DEVICE_CHARGE, 255);
-    }
-    else
-    {
-        ft_button_set_text(button, "Charge");
-        ft_button_set_color(button, &ft_color_w);
+    usleep(200000);
 
-        hw_led_set(HL_DEVICE_CHARGE, 0);
-    }
+    hw_led_set(HL_DEVICE_FLASH_LIGHT, 0);
+    ft_button_set_color(button, &ft_color_w);
 }
 
-static void on_status_led_r_handler(FTButton *button, void *data)
+static void on_rgb_handler(FTButton *button, void *data)
 {
-}
+    ft_button_set_color(button, &ft_color_g);
 
-static void on_status_led_g_handler(FTButton *button, void *data)
-{
-}
+    hw_led_set(HL_DEVICE_LED_R, HL_DEV_LED_FULL);
+    usleep(200000);
 
-static void on_status_led_b_handler(FTButton *button, void *data)
-{
+    hw_led_set(HL_DEVICE_LED_G, HL_DEV_LED_FULL);
+    usleep(200000);
+
+    hw_led_set(HL_DEVICE_LED_B, HL_DEV_LED_FULL);
+    usleep(200000);
+
+    hw_led_set(HL_DEVICE_LED_R, 0);
+    hw_led_set(HL_DEVICE_LED_G, 0);
+    hw_led_set(HL_DEVICE_LED_B, 0);
+
+    ft_button_set_color(button, &ft_color_w);
 }
 
 static void on_lcm_bl_handler(FTButton *button, void *data)
@@ -133,6 +113,8 @@ static void on_lcm_bl_handler(FTButton *button, void *data)
     {
         return;
     }
+
+    ft_button_set_color(button, &ft_color_g);
 
     value = hw_led_get(HL_DEVICE_LCD);
     step = max / 8;
@@ -145,6 +127,7 @@ static void on_lcm_bl_handler(FTButton *button, void *data)
     }
 
     hw_led_set(HL_DEVICE_LCD, value);
+    ft_button_set_color(button, &ft_color_w);
 }
 
 static void ft_lcm_window_draw(FTWidget *widget)
@@ -204,31 +187,18 @@ FTWindow *ft_led_new()
     ft_button_set_handler(button, on_keyboard_led_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);
 
-    button = ft_button_new("Flashlight");
-    ft_button_set_handler(button, on_flash_light_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-
     button = ft_button_new("Trackball");
     ft_button_set_handler(button, on_trackball_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);
 
-    button = ft_button_new("Charge");
-    ft_button_set_handler(button, on_charge_handler, NULL);
+    button = ft_button_new("Flashlight");
+    ft_button_set_handler(button, on_flash_light_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);
 
-/*
-    button = ft_button_new("Status LED R");
-    ft_button_set_handler(button, on_status_led_r_handler, NULL);
+    button = ft_button_new("RGB");
+    ft_button_set_handler(button, on_rgb_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);
 
-    button = ft_button_new("Status LED G");
-    ft_button_set_handler(button, on_status_led_g_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-
-    button = ft_button_new("Status LED B");
-    ft_button_set_handler(button, on_status_led_b_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-*/
     button = ft_button_new("Main LCM BL");
     ft_button_set_handler(button, on_lcm_bl_handler, NULL);
     ft_window_add_child(window, (FTWidget *)button);

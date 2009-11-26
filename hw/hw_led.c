@@ -21,16 +21,24 @@ void hw_led_set(int device, int status)
             hw_file_write(HL_DEV_KP_BACKLIGHT, buf);
             break;
 
+        case HL_DEVICE_FLASH_LIGHT:
+            hw_file_write(HL_DEV_FLASH_LIGHT, buf);
+            break;
+
         case HL_DEVICE_TRACKBALL:
             hw_file_write(HL_DEV_BALL_BRIGHT, buf);
             break;
 
-        case HL_DEVICE_CHARGE:
-            hw_file_write(HL_DEV_CHARGE_BRIGHT, buf);
+        case HL_DEVICE_LED_R:
+            hw_file_write(HL_DEV_LED_R_BRIGHT, buf);
             break;
 
-        case HL_DEVICE_FLASH_LIGHT:
-            hw_file_write(HL_DEV_FLASH_LIGHT, buf);
+        case HL_DEVICE_LED_G:
+            hw_file_write(HL_DEV_LED_G_BRIGHT, buf);
+            break;
+
+        case HL_DEVICE_LED_B:
+            hw_file_write(HL_DEV_LED_B_BRIGHT, buf);
             break;
 
         default:break;
@@ -52,16 +60,24 @@ int hw_led_get(int device)
             text = hw_file_read(HL_DEV_KP_BACKLIGHT, BUF_LEN_MAX);
             break;
 
+        case HL_DEVICE_FLASH_LIGHT:
+            text = hw_file_read(HL_DEV_FLASH_LIGHT, BUF_LEN_MAX);
+            break;
+
         case HL_DEVICE_TRACKBALL:
             text = hw_file_read(HL_DEV_BALL_BRIGHT, BUF_LEN_MAX);
             break;
 
-        case HL_DEVICE_CHARGE:
-            text = hw_file_read(HL_DEV_CHARGE_BRIGHT, BUF_LEN_MAX);
+        case HL_DEVICE_LED_R:
+            text = hw_file_read(HL_DEV_LED_R_BRIGHT, BUF_LEN_MAX);
             break;
 
-        case HL_DEVICE_FLASH_LIGHT:
-            text = hw_file_read(HL_DEV_FLASH_LIGHT, BUF_LEN_MAX);
+        case HL_DEVICE_LED_G:
+            text = hw_file_read(HL_DEV_LED_G_BRIGHT, BUF_LEN_MAX);
+            break;
+
+        case HL_DEVICE_LED_B:
+            text = hw_file_read(HL_DEV_LED_B_BRIGHT, BUF_LEN_MAX);
             break;
 
         default:break;
@@ -88,10 +104,6 @@ int hw_led_get_range(int device, int *min, int *max)
 
         case HL_DEVICE_KEYBOARD:
             text = hw_file_read(HL_DEV_KP_BACKLIGHT_MAX, 0);
-            break;
-
-        case HL_DEVICE_TRACKBALL:
-            text = hw_file_read(HL_DEV_BALL_BRIGHT_MAX, 0);
             break;
 
         default: break;

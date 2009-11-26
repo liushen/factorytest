@@ -1,0 +1,14 @@
+2009-11-24 Liu Shen <liushen@broncho.cn>
+	* hw/hw_led.c: use new interface of lights.
+	* hw/hw_audio.c: use libaudio to instead of shell command.
+	* ft_headset.c: new added.
+
+2009-10-24 Liu Shen <liushen@broncho.cn>
+	* hw/hw_audio.c: remove echoloop volume tunes, set loopback device to
+	BEAR.
+
+2009-10-21 Liu Shen <liushen@broncho.cn>
+	* wait for wifi init before the test.
+	* decrease echolop volume from 50 to 31.
+	* camera preview use full screen mode.
+	* get version from 'ro.build.description' system property.

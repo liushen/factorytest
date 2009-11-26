@@ -5,7 +5,7 @@ enum
 {
     HA_DEVICE_SPEAKER = 0,
     HA_DEVICE_RECEIVER,
-    HA_DEVICE_HANDSET,
+    HA_DEVICE_HEADSET,
 };
 
 enum
@@ -28,5 +28,11 @@ void hw_audio_stop(int device);
 void hw_audio_echoloop_set(int device, int status);
 
 void hw_audio_set_route(int route);
+
+int hw_audio_set(const char *name, int value);
+
+int hw_headset_get_state();
+
+int hw_headset_get_key();
 
 #endif/*_HW_AUDIO_H_*/

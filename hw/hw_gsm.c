@@ -1,3 +1,6 @@
+#undef LOG_TAG
+#define LOG_TAG "Factory"
+
 #include "hw_gsm.h"
 #include "hw_audio.h"
 #include "modemcontrol.h"
@@ -5,6 +8,8 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <string.h>
+#include <termios.h>
+#include <cutils/log.h>
 
 #define AT_BUFFER_MAX   1023
 
@@ -40,6 +45,7 @@ int hw_gsm_close()
     return 0;
 }
 
+#if 0
 char *hw_gsm_send_at(const char *at)
 {
     char cmd[AT_BUFFER_MAX+1];
@@ -65,6 +71,118 @@ char *hw_gsm_send_at(const char *at)
 
     return NULL;
 }
+#else
+int create_cmd_fd(const char *dev)
+{
+    char resp[AT_BUFFER_MAX+1] = {0};
+
+    /* BEGIN serial port set, this section is copy from linux-sio.c */
+    struct termios oldtio, newtio;
+    struct termios* newtio_p = &newtio;
+    unsigned int tio_baudrate = HW_MODEM_SPEED;
+
+	int fd = open(dev, O_RDWR | O_NOCTTY | O_NDELAY);
+    if (fd < 0)
+    {   
+        perror(dev);
+        return 0;
+    }
+
+    memset(newtio_p, 0, sizeof(newtio));
+
+    /* save current port settings */
+    tcgetattr(fd, &oldtio);
+
+	// fcntl(fd, F_SETFL, 0);
+	newtio_p->c_cflag = CLOCAL | CREAD | CS8 | HUPCL | tio_baudrate | CRTSCTS;
+	newtio_p->c_cflag &= ~tio_baudrate;
+	newtio_p->c_cflag |= tio_baudrate;
+
+	newtio_p->c_iflag = IGNBRK;	
+    newtio_p->c_iflag &= ~(INLCR | ICRNL | IGNCR);;
+    /* set input mode */
+    newtio_p->c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+
+	/* set raw output */
+	newtio_p->c_oflag &= ~OPOST;
+	newtio_p->c_oflag &= ~OLCUC;
+	newtio_p->c_oflag &= ~ONLRET;
+	newtio_p->c_oflag &= ~ONOCR;
+	newtio_p->c_oflag &= ~OCRNL;
+
+    tcflush(fd, TCIFLUSH);
+    tcsetattr(fd, TCSANOW, newtio_p);
+
+    return fd;
+}
+
+char *hw_gsm_send_at(const char *at)
+{
+    static int fd = 0;
+    struct timeval tv;
+    char resp[AT_BUFFER_MAX+1] = {0};
+    char *out = NULL;
+    int retval, len = 0, i = 0;
+    fd_set rfds;
+
+    if (fd < 1)
+        fd = create_cmd_fd(AT_CMD_DEV);
+
+    if (fd < 1)
+    {
+        LOGE("create_cmd_fd(\"%s\") fail!", AT_CMD_DEV);
+        return NULL;
+    }
+
+    LOGD("SEND: %s", at);
+    write(fd, at, strlen(at));
+    write(fd, "\n", 1);
+
+    FD_ZERO(&rfds);
+    FD_SET(fd, &rfds);
+
+    tv.tv_sec = 1;
+    tv.tv_usec = 0;
+
+    while((retval = select(fd + 1, &rfds, NULL, NULL, &tv)) != -1)
+    {
+        if (retval < 1)
+            break;
+
+        if (len >= AT_BUFFER_MAX)
+            break;
+
+        len += read(fd, resp+len, AT_BUFFER_MAX-len);
+        resp[len] = '\0';
+
+        if (strstr(resp, "OK") || strstr(resp, "ERROR"))
+            break;
+
+        FD_ZERO(&rfds);
+        FD_SET(fd, &rfds);
+    }
+
+    if (len < 1)
+        return NULL;
+
+    out = strrchr(resp, '+');
+    out = out ? out : resp;
+
+    for (i = 0; i < len; i++)
+    {
+        if (out[i] == '\r')
+        {
+            if (out[i-1] == '\n' && i > 0)
+                out[i-1] = ' ';
+
+            out[i] = ' ';
+        }
+    }
+
+    LOGD("RECV: %s", out);
+    return strdup(out);
+}
+#endif
 
 char *hw_gsm_call(const char *no)
 {
@@ -86,9 +204,6 @@ char *hw_gsm_end_call()
 }
 
 #ifdef HW_GSM_TEST
-#include <stdio.h>
-#include <termios.h>
-
 int exec_cmd(const char *dev, const char *cmd)
 {
     fd_set rfds;

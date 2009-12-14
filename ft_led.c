@@ -37,41 +37,27 @@ static void on_fail_handler(FTButton *button, void *data)
 
 static void on_keyboard_led_handler(FTButton *button, void *data)
 {
-    if (strcmp(button->text, "Keyboard LED") == 0)
-    {
-        int max = 0;
+    int max = 0;
 
-        ft_button_set_text(button, "Keyboard LED ");
-        ft_button_set_color(button, &ft_color_g);
+    hw_led_get_range(HL_DEVICE_KEYBOARD, NULL, &max);
+    hw_led_set(HL_DEVICE_KEYBOARD, max ? max : 1);
+    ft_button_set_color(button, &ft_color_g);
 
-        hw_led_get_range(HL_DEVICE_KEYBOARD, NULL, &max);
-        hw_led_set(HL_DEVICE_KEYBOARD, max ? max : 1);
-    }
-    else
-    {
-        ft_button_set_text(button, "Keyboard LED");
-        ft_button_set_color(button, &ft_color_w);
+    usleep(200000);
 
-        hw_led_set(HL_DEVICE_KEYBOARD, 0);
-    }
+    hw_led_set(HL_DEVICE_KEYBOARD, 0);
+    ft_button_set_color(button, &ft_color_w);
 }
 
 static void on_trackball_handler(FTButton *button, void *data)
 {
-    if (strcmp(button->text, "Trackball") == 0)
-    {
-        ft_button_set_text(button, "Trackball ");
-        ft_button_set_color(button, &ft_color_g);
+    hw_led_set(HL_DEVICE_TRACKBALL, HL_DEV_LED_FULL);
+    ft_button_set_color(button, &ft_color_g);
 
-        hw_led_set(HL_DEVICE_TRACKBALL, HL_DEV_LED_FULL);
-    }
-    else
-    {
-        ft_button_set_text(button, "Trackball");
-        ft_button_set_color(button, &ft_color_w);
+    usleep(200000);
 
-        hw_led_set(HL_DEVICE_TRACKBALL, 0);
-    }
+    hw_led_set(HL_DEVICE_TRACKBALL, 0);
+    ft_button_set_color(button, &ft_color_w);
 }
 
 static void on_flash_light_handler(FTButton *button, void *data)
@@ -123,7 +109,7 @@ static void on_lcm_bl_handler(FTButton *button, void *data)
     {
         hw_led_set(HL_DEVICE_LCD, i);
 
-        usleep(200 * 1000);
+        usleep(100 * 1000);
     }
 
     hw_led_set(HL_DEVICE_LCD, value);

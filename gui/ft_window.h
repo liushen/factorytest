@@ -28,6 +28,8 @@ int ft_window_add(FTWindow *window, FTWidget *widget, int position);
 
 void ft_window_show(FTWindow *window);
 
+void ft_window_event_handler(FTEvent *event, void *data);
+
 void ft_window_draw(FTWidget *widget);
 
 void ft_window_move_focus(FTWindow *window, int orient);

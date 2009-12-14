@@ -1,3 +1,6 @@
+#undef LOG_TAG
+#define LOG_TAG "Factory"
+
 #include "gui/ft_input.h"
 #include "gui/ft_window.h"
 #include "gui/ft_button.h"
@@ -25,8 +28,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/reboot.h>
+#include <cutils/log.h>
 
-#define BUF_LEN_MAX             32
+#define BUF_LEN_MAX             128
 #define BLUETOOTH_TEST_NR       1
 
 #define TEXT_DEVICE_FOUND       "The device detected!"
@@ -295,19 +299,10 @@ static void on_gps_handler(FTButton *button, void *data)
     FTWindow *window;
 
     int status = hw_detect_gps();
-#if 0 
-    window = ft_textpad_new(status ? TEXT_DEVICE_FOUND : TEXT_DEVICE_NOT_FOUND, 1);
-
-    ft_textpad_set_color(window, status ? &ft_color_g : &ft_color_r);
-    ft_textpad_set_id(window, FT_ITEM_GPS);
-
-    ft_window_show(window);
-#else
-    char key[32];
+    char key[BUF_LEN_MAX];
 
     sprintf(key, "%d", FT_ITEM_GPS);
     ft_config_set_int(key, (status > 0) ? FT_STATUS_OK : FT_STATUS_FAIL);
-#endif
 }
 
 static void on_memory_card_handler(FTButton *button, void *data)
@@ -315,19 +310,10 @@ static void on_memory_card_handler(FTButton *button, void *data)
     FTWindow *window;
 
     int status = hw_detect_memory_card();
-#if 0 
-    window = ft_textpad_new(status ? TEXT_DEVICE_FOUND : TEXT_DEVICE_NOT_FOUND, 1);
-
-    ft_textpad_set_color(window, status ? &ft_color_g : &ft_color_r);
-    ft_textpad_set_id(window, FT_ITEM_SD);
-
-    ft_window_show(window);
-#else
-    char key[32];
+    char key[BUF_LEN_MAX];
 
     sprintf(key, "%d", FT_ITEM_SD);
     ft_config_set_int(key, (status > 0) ? FT_STATUS_OK : FT_STATUS_FAIL);
-#endif
 }
 
 static void on_g_sensor_handler(FTButton *button, void *data)
@@ -335,19 +321,10 @@ static void on_g_sensor_handler(FTButton *button, void *data)
     FTWindow *window;
 
     int status = hw_detect_g_sensor();
-#if 0 
-    window = ft_textpad_new(status ? TEXT_DEVICE_FOUND : TEXT_DEVICE_NOT_FOUND, 1);
-
-    ft_textpad_set_color(window, status ? &ft_color_g : &ft_color_r);
-    ft_textpad_set_id(window, FT_ITEM_G_SENS);
-
-    ft_window_show(window);
-#else
-    char key[32];
+    char key[BUF_LEN_MAX];
 
     sprintf(key, "%d", FT_ITEM_G_SENS);
     ft_config_set_int(key, (status > 0) ? FT_STATUS_OK : FT_STATUS_FAIL);
-#endif
 }
 
 static void on_infrared_sensor_handler(FTButton *button, void *data)
@@ -355,19 +332,10 @@ static void on_infrared_sensor_handler(FTButton *button, void *data)
     FTWindow *window;
 
     int status = hw_detect_proximity();
-#if 0 
-    window = ft_textpad_new(status ? TEXT_DEVICE_FOUND : TEXT_DEVICE_NOT_FOUND, 1);
-
-    ft_textpad_set_color(window, status ? &ft_color_g : &ft_color_r);
-    ft_textpad_set_id(window, FT_ITEM_INFRA_SENS);
-
-    ft_window_show(window);
-#else
-    char key[32];
+    char key[BUF_LEN_MAX];
 
     sprintf(key, "%d", FT_ITEM_INFRA_SENS);
     ft_config_set_int(key, (status > 0) ? FT_STATUS_OK : FT_STATUS_FAIL);
-#endif
 }
 
 static void on_optical_sensor_handler(FTButton *button, void *data)
@@ -375,19 +343,80 @@ static void on_optical_sensor_handler(FTButton *button, void *data)
     FTWindow *window;
 
     int status = hw_detect_ambient();
-#if 0    
-    window = ft_textpad_new(status ? TEXT_DEVICE_FOUND : TEXT_DEVICE_NOT_FOUND, 1);
-
-    ft_textpad_set_color(window, status ? &ft_color_g : &ft_color_r);
-    ft_textpad_set_id(window, FT_ITEM_OPTI_SEND);
-
-    ft_window_show(window);
-#else
-    char key[32];
+    char key[BUF_LEN_MAX];
 
     sprintf(key, "%d", FT_ITEM_OPTI_SENS);
     ft_config_set_int(key, (status > 0) ? FT_STATUS_OK : FT_STATUS_FAIL);
-#endif
+}
+
+#define IMEI_INFO_FILE  "/parameters/modem/imei"
+#define SN_INFO_FILE    "/parameters/modem/sn"
+#define AT_BUFFER_MAX   1023
+
+#define SEND_AT(cmd, resp) {\
+    int retry = 0; \
+    do { \
+        if ((resp = hw_gsm_send_at(cmd))) break; \
+        sleep(1); \
+    } while (retry++ < 10); \
+    }
+    
+static void on_imei_sn_handler(FTButton *button, void *data)
+{
+    char *imei_info = NULL;
+    char *sn_info = NULL;
+    char *imei = NULL;
+    char *sn = NULL;
+    char tmp[AT_BUFFER_MAX+1] = {0};
+
+    FTWindow *window = ft_textpad_new("Wait modem on...", 1);
+
+    ft_textpad_set_id(window, FT_ITEM_IMEI_SN);
+    ft_window_show(window);
+
+    imei_info = hw_file_read(IMEI_INFO_FILE, BUF_LEN_MAX);
+    sn_info = hw_file_read(SN_INFO_FILE, BUF_LEN_MAX);
+
+    if (imei_info == NULL || sn_info == NULL)
+    {
+        ft_textpad_set_color(window, &ft_color_r);
+        ft_textpad_set_text(window, "No IMEI/SN info!");
+        return;
+    }
+
+    SEND_AT("AT+EGMR=0,7", imei);   /* read IMEI */
+    SEND_AT("AT+EGMR=0,5", sn);     /* read SN */
+
+    if (!strstr(imei, imei_info))   /* write IMEI (15 digits) */
+    {
+        snprintf(tmp, AT_BUFFER_MAX, "AT+EGMR=1,7,\"%s\"", imei_info);
+        free(imei);
+        SEND_AT(tmp, imei);
+    }
+
+    if (!strstr(sn, sn_info))       /* write SN (less than 30 chars) */
+    {
+        snprintf(tmp, AT_BUFFER_MAX, "AT+EGMR=1,5,\"%s\"", sn_info);
+        free(sn);
+        SEND_AT(tmp, sn);
+    }
+
+    if (strstr(imei, "ERROR") || strstr(sn, "ERROR"))
+    {
+        snprintf(tmp, AT_BUFFER_MAX, "IMEI:\n%s\nSN:\n%s", imei, sn);
+        ft_textpad_set_color(window, &ft_color_r);
+        ft_textpad_set_text(window, tmp);
+    }
+    else
+    {
+        snprintf(tmp, AT_BUFFER_MAX, "IMEI: %s\n%sSN: %s\n%s", imei_info, imei, sn_info, sn);
+        ft_textpad_set_text(window, tmp);
+    }
+
+    free(imei_info);
+    free(imei);
+    free(sn_info);
+    free(sn);
 }
 
 const FTestItem ft_test_items[] = 
@@ -404,14 +433,15 @@ const FTestItem ft_test_items[] =
     {FT_ITEM_ADC, "ADC", on_adc_handler},
     {FT_ITEM_CAMERA, "Camera", on_camera_handler},
     {FT_ITEM_GSM, "GSM", on_gsm_handler},
+    {FT_ITEM_IMEI_SN, "IMEI/SN", on_imei_sn_handler},
     {FT_ITEM_BT, "Bluetooth", on_bluetooth_handler},
     {FT_ITEM_WIFI, "Wifi", on_wifi_handler},
     {FT_ITEM_FM, "FM", on_fm_handler},
     {FT_ITEM_GPS, "GPS", on_gps_handler},
     {FT_ITEM_SD, "SD Card", on_memory_card_handler},
     {FT_ITEM_G_SENS, "G-sensor", on_g_sensor_handler},
-    {FT_ITEM_INFRA_SENS, "Infra-sens", on_infrared_sensor_handler},
-    {FT_ITEM_OPTI_SENS, "Opti-sens", on_optical_sensor_handler},
+    // {FT_ITEM_INFRA_SENS, "Infra-sens", on_infrared_sensor_handler},
+    // {FT_ITEM_OPTI_SENS, "Opti-sens", on_optical_sensor_handler},
 };
 
 static void on_config_changed(const char *key, const char *value, void *data)

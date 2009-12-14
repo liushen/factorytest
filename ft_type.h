@@ -25,6 +25,7 @@ enum
     FT_ITEM_ADC,
     FT_ITEM_CAMERA,
     FT_ITEM_GSM,
+    FT_ITEM_IMEI_SN,
     FT_ITEM_BT,
     FT_ITEM_WIFI,
     FT_ITEM_FM,
@@ -32,7 +33,7 @@ enum
     FT_ITEM_SD,
     FT_ITEM_G_SENS,
     FT_ITEM_INFRA_SENS,
-    FT_ITEM_OPTI_SENS
+    FT_ITEM_OPTI_SENS,
 };
 
 #endif/*_FT_TYPE_H_*/

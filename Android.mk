@@ -42,7 +42,7 @@ LOCAL_CFLAGS := \
 
 LOCAL_C_INCLUDES += $(call include-path-for, bluedroid)
 LOCAL_C_INCLUDES += external/alsa-lib/include
-LOCAL_SHARED_LIBRARIES += libaudio libbluedroid
+LOCAL_SHARED_LIBRARIES += libcutils libaudio libbluedroid
 
 include $(BUILD_EXECUTABLE)
 
@@ -51,6 +51,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES:= hw/hw_gsm.c
 LOCAL_MODULE := at_test
 LOCAL_CFLAGS := -DHW_GSM_TEST
+LOCAL_SHARED_LIBRARIES += libcutils
 
 include $(BUILD_EXECUTABLE)
 

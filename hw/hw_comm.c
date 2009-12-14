@@ -177,10 +177,10 @@ char *hw_file_read(const char *file, size_t len)
 
     if (size > 0)
     {
-        if (buf[size] == '\n')
-            buf[size] = '\0';
+        if (buf[size-1] == '\n')
+            buf[size-1] = '\0';
         else
-            buf[size+1] = '\0';
+            buf[size] = '\0';
 
         return strdup(buf);
     }

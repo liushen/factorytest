@@ -12,8 +12,6 @@ struct _FWContext
 
 static FWContext fw_context;
 
-static void ft_window_event_handler(FTEvent *event, void *data);
-
 FTWindow *ft_window_new()
 {
     FTWindow *window = calloc(1, sizeof(FTWindow));
@@ -239,7 +237,7 @@ static FTWidget *ft_window_find_widget(FTWindow *window, FTPoint *point)
     return NULL;
 }
 
-static void ft_window_event_handler(FTEvent *event, void *data)
+void ft_window_event_handler(FTEvent *event, void *data)
 {
     FTWindow *window = (FTWindow *)data;
 

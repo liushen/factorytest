@@ -22,6 +22,8 @@ LOCAL_SRC_FILES:= \
 		hw/hw_led.c \
 		hw/hw_fm.c \
 		hw/hw_gsm.c \
+		ft_testcase.c \
+		ft_notepad.c \
 		ft_textpad.c \
 		ft_keyboard.c \
 		ft_matrix.c \
@@ -30,6 +32,7 @@ LOCAL_SRC_FILES:= \
 		ft_lcdcolor.c \
 		ft_gsm.c \
 		ft_headset.c \
+		ft_fm.c \
 		ft_config.c \
 		ft_main.c
  

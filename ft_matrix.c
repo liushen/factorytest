@@ -1,4 +1,3 @@
-
 #include "ft_matrix.h"
 #include "ft_config.h"
 #include <stdio.h>
@@ -67,7 +66,7 @@ static void ft_matrix_handler(FTEvent *event, void *data)
 
         if (ke->key == FT_KEY_BACK)
         {
-            ft_config_set_int(key, FT_STATUS_FAIL);
+            ft_config_set_int(key, FT_STATUS_NORMAL);
             ft_window_close(window);
         }
 

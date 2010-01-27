@@ -1,5 +1,9 @@
+#undef LOG_TAG
+#define LOG_TAG "Factory"
+
 #include "ft_lcdcolor.h"
 #include "ft_config.h"
+#include "ft_textpad.h"
 #include "gui/ft_list.h"
 #include "gui/ft_button.h"
 
@@ -7,35 +11,24 @@
 #include <signal.h>
 #include <unistd.h>
 #include <string.h>
+#include <cutils/log.h>
+
+#define FL_COLOR_NR     4
 
 typedef struct _FLContext FLContext;
 
 struct _FLContext
 {
     FTList *windows;
-    int     result;
 };
 
 static FLContext fl_context;
 
 extern FTColor ft_color_r;
 extern FTColor ft_color_g;
+extern FTColor ft_color_b;
 
 static const char *color_descs[] = {"Red", "Green", "Blue", "White", "Black"};
-
-static void on_ok_handler(FTButton *button, void *data)
-{
-    fl_context.result = FT_STATUS_OK;
-
-    ft_window_close(data);
-}
-
-static void on_fail_handler(FTButton *button, void *data)
-{
-    fl_context.result = FT_STATUS_FAIL;
-
-    ft_window_close(data);
-}
 
 static void ft_color_window_draw(FTWidget *widget)
 {
@@ -125,6 +118,28 @@ static FTDrawGC ft_lcdcolor_parse(const char *color)
     return gc;
 }
 
+static void ft_lcdcolor_draw(FTWidget *widget)
+{
+    FBSurface *s = widget->surface;
+    FTDrawGC gc;
+    FTRect rect;
+    int i = 0;
+    
+    ft_window_draw(widget);
+    
+    rect.x = 0;
+    rect.width  = s->width;
+    rect.height = (s->height - FT_WIDGET_HEIGHT - FT_WIDGET_SPACING) / FL_COLOR_NR;
+
+    for (i = 0; i < FL_COLOR_NR; i++)
+    {
+        rect.y = i * rect.height + FT_WIDGET_HEIGHT + FT_WIDGET_SPACING;
+        gc = ft_lcdcolor_parse(color_descs[i]);
+
+        ft_draw_box(s, &rect, &gc, 1);
+    }
+}
+
 static void ft_lcdcolor_demo(FTButton *button, void *data)
 {
     FTWindow *window;
@@ -154,80 +169,53 @@ static void ft_lcdcolor_display(FTButton *button, void *data)
     ft_window_show(window);
 }
 
-void ft_lcdcolor_destroy(FTWidget *widget)
-{
-    char key[32];
-
-    sprintf(key, "%d", FT_ITEM_LCD);
-
-    ft_config_set_int(key, fl_context.result);
-    ft_window_destroy(widget);
-}
-
 FTWindow *ft_lcdcolor_new()
 {
     FTWindow *window;
     FTWidget *widget;
     FTButton *button;
-    FBSurface *s;
-    FTRect *rect;
 
-    window = ft_window_new();
+    window = ft_textpad_new(NULL, 0);
     widget = (FTWidget *)window;
 
+    FTList *iter = window->children;
+
+    for (; iter; iter = iter->next)
+    {
+        FTWidget *w = (FTWidget *)iter->data;
+        FTRect *rect = &w->rect;
+
+        rect->width = rect->height = 0;
+    }
+
+    ft_window_layout(window);
+#if 0
     button = ft_button_new("Auto display");
     ft_button_set_handler(button, ft_lcdcolor_demo, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
+    ft_window_add(window, (FTWidget *)button, 0);
 
     button = ft_button_new("Red");
     ft_button_set_handler(button, ft_lcdcolor_display, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
+    ft_window_add(window, (FTWidget *)button, 1);
 
     button = ft_button_new("Green");
     ft_button_set_handler(button, ft_lcdcolor_display, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
+    ft_window_add(window, (FTWidget *)button, 2);
 
     button = ft_button_new("Blue");
     ft_button_set_handler(button, ft_lcdcolor_display, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
+    ft_window_add(window, (FTWidget *)button, 3);
 
     button = ft_button_new("White");
     ft_button_set_handler(button, ft_lcdcolor_display, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
+    ft_window_add(window, (FTWidget *)button, 4);
 
     button = ft_button_new("Black");
     ft_button_set_handler(button, ft_lcdcolor_display, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
-
-    s = widget->surface;
-
-    button = ft_button_new("       OK");
-
-    rect = &((FTWidget *)button)->rect;
-    rect->x = FT_WIDGET_SPACING;
-    rect->y = s->height - FT_WIDGET_HEIGHT - FT_WIDGET_SPACING;
-    rect->width = s->width / 2 - FT_WIDGET_SPACING;
-    rect->height = FT_WIDGET_HEIGHT;
-
-    ft_button_set_color(button, &ft_color_g);
-    ft_button_set_handler(button, on_ok_handler, window);
-    ft_window_add_child(window, (FTWidget *)button);
-
-    button = ft_button_new("      FAIL");
-
-    rect = &((FTWidget *)button)->rect;
-    rect->x = s->width / 2 + FT_WIDGET_SPACING;
-    rect->y = s->height - FT_WIDGET_HEIGHT - FT_WIDGET_SPACING;
-    rect->width = s->width / 2 - FT_WIDGET_SPACING;
-    rect->height = FT_WIDGET_HEIGHT;
-
-    ft_button_set_color(button, &ft_color_r);
-    ft_button_set_handler(button, on_fail_handler, window);
-    ft_window_add_child(window, (FTWidget *)button);
-
-    fl_context.result = FT_STATUS_NORMAL;
-
-    widget->destroy = ft_lcdcolor_destroy;
+    ft_window_add(window, (FTWidget *)button, 5);
+#endif
+    ft_textpad_set_id(window, FT_ITEM_LCD);
+    widget->draw = ft_lcdcolor_draw;
 
     return window;
 }

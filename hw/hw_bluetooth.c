@@ -2,10 +2,11 @@
 #include <bluedroid/bluetooth.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 int hw_bluetooth_enable()
 {
-    if (bt_is_enabled())
+    if (bt_is_enabled() > 0)
         return 1;
 
     return bt_enable() == 0;
@@ -13,10 +14,13 @@ int hw_bluetooth_enable()
 
 int hw_bluetooth_disable()
 {
-    if (!bt_is_enabled())
+    if (bt_is_enabled() < 1)
         return 1;
 
-    return bt_disable() == 0;
+    int ret = bt_disable();
+    sleep(1);
+
+    return ret == 0;
 }
 
 int hw_bluetooth_is_enabled()

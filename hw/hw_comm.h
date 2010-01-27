@@ -18,6 +18,7 @@
 
 #define HW_WIFI_MODULE      "sd8xxx"
 #define HW_WIFI_SERVICE     "gh3801_init"
+#define HW_ADC_CHECK_EXEC   "record calibrate read"
 
 const char *hw_get_version();
 

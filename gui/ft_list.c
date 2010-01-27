@@ -101,6 +101,34 @@ FTList *ft_list_delete(FTList *list, void *data)
     return ft_list_first(list);
 }
 
+FTList *ft_list_delete_link(FTList *list, FTList *link)
+{
+    FTList *iter;
+
+    iter = ft_list_first(list);
+
+    for (; iter; iter = iter->next)
+    {
+        if (iter == link)
+        {
+            if (iter->prev)
+                iter->prev->next = iter->next;
+
+            if (iter->next)
+                iter->next->prev = iter->prev;
+            
+            if (list == iter)
+                list = iter->next ? iter->next : iter->prev;
+
+            free(iter);
+
+            break;
+        }
+    }
+
+    return ft_list_first(list);
+}
+
 FTList *ft_list_nth(FTList *list, int nth)
 {
     int i = 0;
@@ -123,6 +151,38 @@ FTList *ft_list_find(FTList *list, void *data)
     }
 
     return iter;
+}
+
+int ft_list_position(FTList *list, FTList *link)
+{
+    FTList *iter = ft_list_first(list);
+    int index = 0;
+
+    for (; iter; iter = iter->next)
+    {
+        if (iter == link) 
+            return index;
+
+        index++;
+    }
+
+    return -1;
+}
+
+int ft_list_index(FTList *list, void *data)
+{
+    FTList *iter = ft_list_first(list);
+    int index = 0;
+
+    for (; iter; iter = iter->next)
+    {
+        if (iter->data == data) 
+            return index;
+
+        index++;
+    }
+
+    return -1;
 }
 
 int ft_list_length(FTList *list)

@@ -1,4 +1,5 @@
 #include "ft_status_button.h"
+#include "ft_window.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -11,6 +12,13 @@ static void ft_status_button_draw(FTWidget *widget)
 {
     FTButton *button = (FTButton *)widget;
     FTStatusButton *status_button = (FTStatusButton *)widget;
+    FTWindow *window = (FTWindow *)ft_widget_get_parent(widget);
+
+    if (!widget->visible)
+        return;
+
+    if (!ft_window_is_active(window))
+        return;
 
     FTDrawGC gc = widget->gc;
     FTRect *rect = &widget->rect;
@@ -18,9 +26,6 @@ static void ft_status_button_draw(FTWidget *widget)
     int status = status_button->status;
 
     const char *status_text[] = {"", "[OK]", "[X]", NULL};
-
-    if (!widget->visible)
-        return;
 
     ft_widget_draw(widget);
 
@@ -69,6 +74,8 @@ FTStatusButton *ft_status_button_new(const char *text)
 
 void ft_status_button_set_status(FTStatusButton *button, int status)
 {
+    assert(button != NULL);
+
     button->status = status;
 
     ft_status_button_draw((FTWidget *)button);

@@ -20,11 +20,15 @@ struct _FTWindow
 
 FTWindow *ft_window_new();
 
+FTWindow *ft_window_get_top();
+
 FTWidget *ft_window_get_focus(FTWindow *window);
 
 int ft_window_add_child(FTWindow *window, FTWidget *widget);
 
 int ft_window_add(FTWindow *window, FTWidget *widget, int position);
+
+int ft_window_is_active(FTWindow *window);
 
 void ft_window_show(FTWindow *window);
 

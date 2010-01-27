@@ -1,19 +1,12 @@
 #include "ft_led.h"
 #include "ft_config.h"
+#include "ft_textpad.h"
 #include "gui/ft_button.h"
 #include "hw/hw_led.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-
-typedef struct _FLContext FLContext;
-
-struct _FLContext
-{
-    int result;
-};
-
-static FLContext fl_context;
 
 extern FTColor ft_color_r;
 extern FTColor ft_color_g;
@@ -21,18 +14,39 @@ extern FTColor ft_color_w;
 
 static FTWindow *ft_lcm_window_new();
 
-static void on_ok_handler(FTButton *button, void *data)
+static void on_all_led_handler(FTButton *button, void *data)
 {
-    fl_context.result = FT_STATUS_OK;
+    if (strcmp(button->text, "All LEDs") == 0)
+    {
+        int max = 0;
 
-    ft_window_close(data);
-}
+        ft_button_set_text(button, "All LEDs ");
+        ft_button_set_color(button, &ft_color_g);
 
-static void on_fail_handler(FTButton *button, void *data)
-{
-    fl_context.result = FT_STATUS_FAIL;
+        hw_led_get_range(HL_DEVICE_KEYBOARD, NULL, &max);
+        hw_led_set(HL_DEVICE_KEYBOARD, max ? max : 1);
+        hw_led_set(HL_DEVICE_TRACKBALL, HL_DEV_LED_FULL);
+        hw_led_set(HL_DEVICE_FLASH_LIGHT, -1);
 
-    ft_window_close(data);
+        hw_led_set(HL_DEVICE_LED_R, HL_DEV_LED_FULL);
+        usleep(200000);
+        hw_led_set(HL_DEVICE_LED_G, HL_DEV_LED_FULL);
+        usleep(200000);
+        hw_led_set(HL_DEVICE_LED_B, HL_DEV_LED_FULL);
+        usleep(200000);
+    }
+    else
+    {
+        ft_button_set_text(button, "All LEDs");
+        ft_button_set_color(button, &ft_color_w);
+
+        hw_led_set(HL_DEVICE_KEYBOARD, 0);
+        hw_led_set(HL_DEVICE_TRACKBALL, 0);
+        hw_led_set(HL_DEVICE_FLASH_LIGHT, 0);
+        hw_led_set(HL_DEVICE_LED_R, 0);
+        hw_led_set(HL_DEVICE_LED_G, 0);
+        hw_led_set(HL_DEVICE_LED_B, 0);
+    }
 }
 
 static void on_keyboard_led_handler(FTButton *button, void *data)
@@ -148,75 +162,53 @@ static FTWindow *ft_lcm_window_new()
 
 void ft_led_destroy(FTWidget *widget)
 {
-    char key[32];
+    ft_textpad_destroy(widget);
 
-    sprintf(key, "%d", FT_ITEM_LED);
-
-    ft_config_set_int(key, fl_context.result);
-    ft_window_destroy(widget);
+    hw_led_set(HL_DEVICE_KEYBOARD, 0);
+    hw_led_set(HL_DEVICE_TRACKBALL, 0);
+    hw_led_set(HL_DEVICE_FLASH_LIGHT, 0);
+    hw_led_set(HL_DEVICE_LED_R, 0);
+    hw_led_set(HL_DEVICE_LED_G, 0);
+    hw_led_set(HL_DEVICE_LED_B, 0);
 }
 
 FTWindow *ft_led_new()
 {
     FTWindow *window;
     FTWidget *widget;
-    FTButton *button;
-    FBSurface *s;
-    FTRect *rect;
+    FTButton *button, *all_button;
 
-    window = ft_window_new();
+    window = ft_textpad_new(NULL, 0);
     widget = (FTWidget *)window;
-
-    s = widget->surface;
 
     button = ft_button_new("Keyboard LED");
     ft_button_set_handler(button, on_keyboard_led_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
+    ft_window_add(window, (FTWidget *)button, 0);
 
     button = ft_button_new("Trackball");
     ft_button_set_handler(button, on_trackball_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
+    ft_window_add(window, (FTWidget *)button, 1);
 
     button = ft_button_new("Flashlight");
     ft_button_set_handler(button, on_flash_light_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
+    ft_window_add(window, (FTWidget *)button, 2);
 
     button = ft_button_new("RGB");
     ft_button_set_handler(button, on_rgb_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
+    ft_window_add(window, (FTWidget *)button, 3);
 
     button = ft_button_new("Main LCM BL");
     ft_button_set_handler(button, on_lcm_bl_handler, NULL);
-    ft_window_add_child(window, (FTWidget *)button);
+    ft_window_add(window, (FTWidget *)button, 4);
 
-    button = ft_button_new("       OK");
+    all_button = ft_button_new("All LEDs");
+    ft_button_set_handler(all_button, on_all_led_handler, NULL);
+    ft_window_add(window, (FTWidget *)all_button, 5);
 
-    rect = &((FTWidget *)button)->rect;
-    rect->x = FT_WIDGET_SPACING;
-    rect->y = s->height - FT_WIDGET_HEIGHT - FT_WIDGET_SPACING;
-    rect->width = s->width / 2 - FT_WIDGET_SPACING;
-    rect->height = FT_WIDGET_HEIGHT;
-
-    ft_button_set_color(button, &ft_color_g);
-    ft_button_set_handler(button, on_ok_handler, window);
-    ft_window_add_child(window, (FTWidget *)button);
-
-    button = ft_button_new("      FAIL");
-
-    rect = &((FTWidget *)button)->rect;
-    rect->x = s->width / 2 + FT_WIDGET_SPACING;
-    rect->y = s->height - FT_WIDGET_HEIGHT - FT_WIDGET_SPACING;
-    rect->width = s->width / 2 - FT_WIDGET_SPACING;
-    rect->height = FT_WIDGET_HEIGHT;
-
-    ft_button_set_color(button, &ft_color_r);
-    ft_button_set_handler(button, on_fail_handler, window);
-    ft_window_add_child(window, (FTWidget *)button);
-
-    fl_context.result = FT_STATUS_NORMAL;
     widget->destroy = ft_led_destroy;
-
     ft_window_show(window);
+
+    ft_textpad_set_id(window, FT_ITEM_LED);
 
     return window;
 }

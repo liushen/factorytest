@@ -1,7 +1,7 @@
 #ifndef _FT_CONFIG_H_
 #define _FT_CONFIG_H_
 
-#define FT_CONFIG_FILE  "/data/factory_test.conf"
+#define FT_CONFIG_FILE  "/data/factory_test.dat"
 
 typedef void (*FCHandler)(const char *key, const char *value, void *data);
 

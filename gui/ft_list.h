@@ -23,9 +23,15 @@ FTList *ft_list_insert(FTList *list, void *data, int position);
 
 FTList *ft_list_delete(FTList *list, void *data);
 
+FTList *ft_list_delete_link(FTList *list, FTList *link);
+
 FTList *ft_list_nth(FTList *list, int nth);
 
 FTList *ft_list_find(FTList *list, void *data);
+
+int ft_list_position(FTList *list, FTList *link);
+
+int ft_list_index(FTList *list, void *data);
 
 int ft_list_length(FTList *list);
 

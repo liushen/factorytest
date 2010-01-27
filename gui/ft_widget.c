@@ -118,3 +118,8 @@ void ft_widget_destroy(FTWidget *widget)
         widget->destroy(widget);
 }
 
+FTWidget *ft_widget_get_parent(FTWidget *widget)
+{
+    return widget->parent;
+}
+

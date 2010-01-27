@@ -25,8 +25,7 @@ const char *hw_get_version()
     if ((p = strchr(build, ' ')))
         *p = '\0';
 
-    snprintf(version, VER_LEN_MAX, 
-            "Version No: %s\nSerial No: %s", hw_ver, build);
+    snprintf(version, VER_LEN_MAX, "PCB: %s\nROM: %s", hw_ver, build);
 
     free(hw_ver);
 
@@ -36,6 +35,10 @@ const char *hw_get_version()
 const char *hw_get_adc()
 {
     static char adc[ADC_LEN_MAX];
+
+    if (system(HW_ADC_CHECK_EXEC) != 0)
+        return NULL;
+
     char *vol = hw_file_read(HW_DEV_BATTERY_VOL, 16);
     char *cur = hw_file_read(HW_DEV_BATTERY_CUR, 16);
 

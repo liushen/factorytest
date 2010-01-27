@@ -1,3 +1,6 @@
+#undef LOG_TAG
+#define LOG_TAG "Factory"
+
 #include "ft_textpad.h"
 #include "ft_config.h"
 #include "gui/ft_button.h"
@@ -6,8 +9,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cutils/log.h>
 
-#define FT_MAX_LINE     (10)
+#define FT_MAX_LINE         10
+#define FT_LINE_SPACING     4
 
 typedef struct _FTContext FTContext;
 
@@ -82,14 +87,13 @@ static char **ft_textpad_split(const char *text, int *len)
 static void ft_textpad_draw(FTWidget *widget)
 {
     FBSurface *s = widget->surface;
-    FTDrawGC gc = widget->gc;
     FTPoint point;
 
     char **lines = NULL;
     int len = 0, i;
 
-    gc.foreground = widget->gc.background;
-    gc.background = widget->gc.background;
+    if (!ft_window_is_active((FTWindow *)widget))
+        return;
 
     ft_window_draw(widget);
 
@@ -102,9 +106,9 @@ static void ft_textpad_draw(FTWidget *widget)
     lines = ft_textpad_split(ft_context.text, &len);
 
     if (ft_context.center)
-        point.y = s->height / 2 - FT_FONT_H * len;
+        point.y = (s->height - (FT_FONT_H + FT_LINE_SPACING) * len) / 2;
 
-    for (i = 0; i < len; i++, point.y += FT_FONT_H * 2)
+    for (i = 0; i < len; i++, point.y += FT_FONT_H + FT_LINE_SPACING)
     {
         if (ft_context.center)
             point.x = (s->width - FT_FONT_W * strlen(lines[i])) / 2;
@@ -118,8 +122,30 @@ static void ft_textpad_draw(FTWidget *widget)
     free(lines);
 }
 
+void ft_textpad_event_handler(FTEvent *event, void *data)
+{
+    FTWindow *window = (FTWindow *)data;
+    FTKeyEvent *ke;
+
+    if (event->type == FE_KEY_RELEASE)
+    {
+        ke = (FTKeyEvent *)event;
+
+        if (ke->key == FT_KEY_SEND || ke->key == FT_KEY_END)
+        {
+            ft_context.result = (ke->key == FT_KEY_SEND) ? FT_STATUS_OK : FT_STATUS_FAIL;
+            ft_window_close(window);
+            return;
+        }
+    }
+
+    ft_window_event_handler(event, data);
+}
+
 void ft_textpad_destroy(FTWidget *widget)
 {
+    ft_window_destroy(widget);
+
     if (ft_context.id != -1)
     {
         char key[32];
@@ -127,8 +153,6 @@ void ft_textpad_destroy(FTWidget *widget)
         sprintf(key, "%d", ft_context.id);
         ft_config_set_int(key, ft_context.result);
     }
-
-    ft_window_destroy(widget);
 }
 
 FTWindow *ft_textpad_new(const char *text, int center)
@@ -144,7 +168,7 @@ FTWindow *ft_textpad_new(const char *text, int center)
     rect = &((FTWidget *)button)->rect;
     rect->x = FT_WIDGET_SPACING;
     rect->y = s->height - FT_WIDGET_HEIGHT - FT_WIDGET_SPACING;
-    rect->width = s->width / 2 - FT_WIDGET_SPACING;
+    rect->width = s->width / 2 - FT_WIDGET_SPACING * 2;
     rect->height = FT_WIDGET_HEIGHT;
 
     ft_button_set_color(button, &ft_color_g);
@@ -156,7 +180,7 @@ FTWindow *ft_textpad_new(const char *text, int center)
     rect = &((FTWidget *)button)->rect;
     rect->x = s->width / 2 + FT_WIDGET_SPACING;
     rect->y = s->height - FT_WIDGET_HEIGHT - FT_WIDGET_SPACING;
-    rect->width = s->width / 2 - FT_WIDGET_SPACING;
+    rect->width = s->width / 2 - FT_WIDGET_SPACING * 2;
     rect->height = FT_WIDGET_HEIGHT;
 
     ft_button_set_color(button, &ft_color_r);
@@ -164,12 +188,13 @@ FTWindow *ft_textpad_new(const char *text, int center)
     ft_window_add_child(window, (FTWidget *)button);
 
     widget->draw = ft_textpad_draw;
+    widget->handler = ft_textpad_event_handler;
     widget->destroy = ft_textpad_destroy;
 
     free(ft_context.text);
 
     ft_context.id = -1;
-    ft_context.text = strdup(text);
+    ft_context.text = text ? strdup(text) : NULL;
     ft_context.center = center;
     ft_context.result = FT_STATUS_NORMAL;
 
@@ -180,7 +205,7 @@ void ft_textpad_set_text(FTWindow *textpad, const char *text)
 {
     free(ft_context.text);
 
-    ft_context.text = strdup(text);
+    ft_context.text = text ? strdup(text) : NULL;
 
     ft_textpad_draw((FTWidget *)textpad);
 }
@@ -197,5 +222,10 @@ void ft_textpad_set_color(FTWindow *textpad, FTColor *color)
 void ft_textpad_set_id(FTWindow *textpad, int test_id)
 {
     ft_context.id = test_id;
+}
+
+void ft_textpad_set_result(FTWindow *textpad, int result)
+{
+    ft_context.result = result;
 }
 

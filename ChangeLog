@@ -1,3 +1,12 @@
+2010-01-25 Liu Shen <liushen@broncho.cn>
+	* hw/hw_bluetooth.c: sleep 1s when bt_disable() finish.
+
+2010-01-12 Liu Shen <liushen@broncho.cn>
+	* add ft_fm.c, ft_notepad.c, ft_testcase.c.
+	* add FM channel.
+	* add auto test support.
+	* KEY_SEND/KEY_END can respone the result.
+
 2009-11-24 Liu Shen <liushen@broncho.cn>
 	* hw/hw_led.c: use new interface of lights.
 	* hw/hw_audio.c: use libaudio to instead of shell command.

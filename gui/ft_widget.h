@@ -29,6 +29,7 @@ enum
 
 struct _FTWidget
 {
+    FTWidget       *parent;
     FTWidgetStatus  status;
     FTWidgetType    type;
     FTWidgetDraw    draw;       /* required */
@@ -43,6 +44,8 @@ struct _FTWidget
     int             focus;
     int             visible;
 };
+
+FTWidget *ft_widget_get_parent(FTWidget *);
 
 void ft_widget_init(FTWidget *widget, FTRect *rect, FTWidgetType type);
 

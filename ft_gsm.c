@@ -8,29 +8,6 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef struct _FGContext FGContext;
-
-struct _FGContext
-{
-    int result;
-};
-
-static FGContext fg_context;
-
-static void on_ok_handler(FTButton *button, void *data)
-{
-    fg_context.result = FT_STATUS_OK;
-
-    ft_window_close(data);
-}
-
-static void on_fail_handler(FTButton *button, void *data)
-{
-    fg_context.result = FT_STATUS_FAIL;
-
-    ft_window_close(data);
-}
-
 static void on_gsm_call_handler(FTButton *button, void *data)
 {
     FTWindow *window = (FTWindow *)data;
@@ -84,22 +61,12 @@ static void on_gsm_route_handler(FTButton *button, void *data)
     }
 }
 
-void ft_gsm_destroy(FTWidget *widget)
-{
-    char key[32];
-
-    sprintf(key, "%d", FT_ITEM_LED);
-
-    ft_config_set_int(key, fg_context.result);
-    ft_window_destroy(widget);
-}
-
 FTWindow *ft_gsm_new()
 {
     FTWindow *window;
     FTButton *button;
 
-    window = ft_textpad_new("", 1);
+    window = ft_textpad_new(NULL, 1);
 
     button = ft_button_new("Call 112");
     ft_button_set_handler(button, on_gsm_call_handler, window);
@@ -117,15 +84,9 @@ FTWindow *ft_gsm_new()
     ft_button_set_handler(button, on_gsm_op_handler, window);
     ft_window_add(window, (FTWidget *)button, 3);
 
-    button = ft_button_new("Speaker");
-    ft_button_set_handler(button, on_gsm_route_handler, window);
-    ft_window_add(window, (FTWidget *)button, 4);
-
     button = ft_button_new("End call");
     ft_button_set_handler(button, on_gsm_end_call_handler, window);
-    ft_window_add(window, (FTWidget *)button, 5);
-
-    fg_context.result = FT_STATUS_NORMAL;
+    ft_window_add(window, (FTWidget *)button, 4);
 
     hw_audio_set_route(HA_ROUTE_CALL_HS);
 

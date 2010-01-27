@@ -12,6 +12,8 @@ struct _FAContext
 
 static FAContext fa_context;
 
+extern FTColor ft_color_r;
+
 static void ft_adc_destroy(FTWidget *widget)
 {
     fa_context.window = NULL;
@@ -43,6 +45,13 @@ FTWindow *ft_adc_new()
 
     widget->destroy = ft_adc_destroy;
     fa_context.window = window;
+
+    if (adc == NULL)
+    {
+        ft_textpad_set_text(window, "ADC is NOT calibrated!");
+        ft_textpad_set_color(window, &ft_color_r);
+        return window;
+    }
 
     signal(SIGALRM, ft_adc_on_timer);
     alarm(1); 

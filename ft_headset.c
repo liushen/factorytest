@@ -1,3 +1,6 @@
+#undef LOG_TAG
+#define LOG_TAG "Factory"
+
 #include "ft_headset.h"
 #include "ft_textpad.h"
 #include "hw/hw_comm.h"
@@ -5,6 +8,7 @@
 
 #include <stdio.h>
 #include <signal.h>
+#include <cutils/log.h>
 
 typedef struct _FHContext FHContext;
 
@@ -42,6 +46,8 @@ static void ft_headset_destroy(FTWidget *widget)
 {
     fh_context.window = NULL;
     ft_textpad_destroy(widget);
+
+    hw_audio_echoloop_set(HA_DEVICE_HEADSET, 0);
 }
 
 static void ft_headset_event_handler(FTEvent *event, void *data)
@@ -59,7 +65,7 @@ static void ft_headset_event_handler(FTEvent *event, void *data)
         }
     }
 
-    ft_window_event_handler(event, data);
+    ft_textpad_event_handler(event, data);
 }
 
 static void ft_headset_on_timer(int signal)
@@ -79,7 +85,7 @@ FTWindow *ft_headset_new()
     FTButton *button;
     FTWidget *widget;
 
-    window = ft_textpad_new("", 1);
+    window = ft_textpad_new(NULL, 1);
     widget = (FTWidget *)window;
 
     fh_context.button_hs = ft_button_new("HEADSET");

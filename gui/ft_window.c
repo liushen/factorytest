@@ -27,8 +27,6 @@ FTWindow *ft_window_new()
     widget->rect.width = widget->surface->width;
     widget->rect.height = widget->surface->height;
 
-    window->buffer = malloc(widget->surface->size);
-
     widget->destroy = ft_window_destroy;
     widget->handler = ft_window_event_handler;
     widget->data = window;
@@ -88,6 +86,9 @@ void ft_window_draw(FTWidget *widget)
     FTWidget *w;
     FBSurface *s = widget->surface;
 
+    if (!widget->visible || !ft_window_is_active(window))
+        return;
+
     memset(s->buffer, 0, s->size);
 
     FTList *iter = window->children;
@@ -98,8 +99,6 @@ void ft_window_draw(FTWidget *widget)
 
         w->draw(w);
     }
-
-    memcpy(window->buffer, s->buffer, s->size);
 }
 
 int ft_window_add_child(FTWindow *window, FTWidget *widget)
@@ -107,6 +106,7 @@ int ft_window_add_child(FTWindow *window, FTWidget *widget)
     assert(widget != NULL);
 
     window->children = ft_list_append(window->children, widget);
+    widget->parent = (FTWidget *)window;
 
     ft_window_layout(window);
 
@@ -121,10 +121,23 @@ int ft_window_add(FTWindow *window, FTWidget *widget, int position)
         return ft_window_add_child(window, widget);
 
     window->children = ft_list_insert(window->children, widget, position);
+    widget->parent = (FTWidget *)window;
 
     ft_window_layout(window);
 
     return FT_SUCCESS;
+}
+
+int ft_window_is_active(FTWindow *window)
+{
+    return window == ft_window_get_top();
+}
+
+FTWindow *ft_window_get_top()
+{
+    FTList *iter = ft_list_last(fw_context.windows);
+
+    return iter ? iter->data : NULL;
 }
 
 FTWidget *ft_window_get_focus(FTWindow *window)
@@ -187,6 +200,7 @@ void ft_window_move_focus(FTWindow *window, int orient)
 void ft_window_close(FTWindow *window)
 {
     FTWidget *widget = (FTWidget *)window;
+    FTWindow *w = NULL;
 
     FTList *last = ft_list_last(fw_context.windows);
 
@@ -195,12 +209,13 @@ void ft_window_close(FTWindow *window)
     if (window == last->data)
     {
         if (last->prev)
-            ft_window_show((FTWindow *)last->prev->data);
+            w = (FTWindow *)last->prev->data;
         else
             exit(FT_SUCCESS);
     }
 
     fw_context.windows = ft_list_delete(fw_context.windows, window);
+    ft_window_show(w);
 }
 
 void ft_window_destroy(FTWidget *widget)
@@ -215,7 +230,6 @@ void ft_window_destroy(FTWidget *widget)
         w->destroy(w);
     }
 
-    free(window->buffer);
     free(window);
 }
 
